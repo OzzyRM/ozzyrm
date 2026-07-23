@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-23T03:55:08.713Z",
+  "generatedAt": "2026-07-23T14:19:48.523Z",
   "orm": "prisma",
   "version": "unknown",
   "dataSource": {
@@ -266,10 +266,12 @@
       "name": "Role",
       "values": [
         {
-          "name": "USER"
+          "name": "USER",
+          "dbName": "user"
         },
         {
-          "name": "ADMIN"
+          "name": "ADMIN",
+          "dbName": "admin"
         }
       ]
     }

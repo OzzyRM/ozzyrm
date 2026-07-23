@@ -9,10 +9,11 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@reldoc/core": "workspace:*",
+    "lucide-react": "^1.26.0",
     "next": "16.2.10",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "@reldoc/core": "workspace:*",
     "zod": "^3.24.0"
   },
   "devDependencies": {

@@ -9,7 +9,9 @@
   ],
   "scripts": {
     "generate": "bun run scripts/generate.ts",
-    "dev": "bun run generate && bun run --cwd web dev",
+    "dev": "bun run scripts/dev.ts",
+    "dev:web": "bun run --cwd web dev",
+    "watch:schema": "bun run scripts/watch-schema.ts",
     "build:packages": "bun run --cwd packages/core build && bun run --cwd packages/prisma build && bun run --cwd packages/drizzle build"
   },
   "devDependencies": {
