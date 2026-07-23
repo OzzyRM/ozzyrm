@@ -1,0 +1,26 @@
+{
+  "name": "reldoc-monorepo",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "web"
+  ],
+  "scripts": {
+    "generate": "bun run scripts/generate.ts",
+    "dev": "bun run generate && bun run --cwd web dev",
+    "build:packages": "bun run --cwd packages/core build && bun run --cwd packages/prisma build && bun run --cwd packages/drizzle build"
+  },
+  "devDependencies": {
+    "@prisma/internals": "^7.8.0",
+    "@types/bun": "latest",
+    "@types/node": "^26.1.0",
+    "@reldoc/core": "workspace:*",
+    "@reldoc/parser-drizzle": "workspace:*",
+    "@reldoc/parser-prisma": "workspace:*"
+  },
+  "peerDependencies": {
+    "typescript": "^6.0.3"
+  }
+}
