@@ -1,5 +1,5 @@
 import type { DocEnum } from "@reldoc/core";
-import { sectionId } from "@/lib/section-id";
+import { enumValueSectionId, sectionId } from "@/lib/section-id";
 
 interface EnumDetailProps {
     enumDef: DocEnum;
@@ -41,7 +41,9 @@ export function EnumDetail({ enumDef }: EnumDetailProps) {
                         {enumDef.values.map((value) => (
                             <tr
                                 key={value.name}
-                                className="border-b border-border last:border-b-0 hover:bg-code-bg/30"
+                                id={enumValueSectionId(enumDef.name, value.name)}
+                                data-field
+                                className="scroll-mt-20 border-b border-border last:border-b-0 hover:bg-code-bg/30 data-[highlight=true]:bg-accent/10"
                             >
                                 <td className="px-3 py-2 font-mono text-[12px]">{value.name}</td>
                                 <td className="px-3 py-2 font-mono text-[12px] text-muted">

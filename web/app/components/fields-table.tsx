@@ -1,8 +1,14 @@
+"use client";
+
 import type { DocField } from "@reldoc/core";
+import { ArrowRight } from "lucide-react";
+import { fieldSectionId } from "@/lib/section-id";
 import { Badge } from "./ui/badge";
 
 interface FieldsTableProps {
     fields: DocField[];
+    modelName: string;
+    onNavigate: (id: string) => void;
 }
 
 function formatDefault(field: DocField): string {
@@ -33,7 +39,7 @@ function formatConstraints(field: DocField): string[] {
     return items;
 }
 
-export function FieldsTable({ fields }: FieldsTableProps) {
+export function FieldsTable({ fields, modelName, onNavigate }: FieldsTableProps) {
     return (
         <div className="overflow-x-auto rounded-md border border-border">
             <table className="min-w-full text-[13px]">
@@ -57,11 +63,14 @@ export function FieldsTable({ fields }: FieldsTableProps) {
                     {fields.map((field) => {
                         const constraints = formatConstraints(field);
                         const typeLabel = field.enumName ?? field.nativeType ?? field.type;
+                        const rowId = fieldSectionId(modelName, field.name);
 
                         return (
                             <tr
                                 key={field.name}
-                                className="border-b border-border align-top last:border-b-0 hover:bg-code-bg/30"
+                                id={rowId}
+                                data-field
+                                className="scroll-mt-20 border-b border-border align-top transition-colors last:border-b-0 hover:bg-code-bg/30 data-[highlight=true]:bg-accent/10"
                             >
                                 <td className="px-3 py-2">
                                     <div className="font-mono text-[12px] font-medium">{field.name}</div>
@@ -74,10 +83,17 @@ export function FieldsTable({ fields }: FieldsTableProps) {
                                         <div className="mt-1 text-[12px] text-muted">{field.description}</div>
                                     )}
                                     {field.relation && (
-                                        <div className="mt-1 font-mono text-[11px] text-muted">
-                                            → {field.relation.model}.{field.relation.field}
-                                            <span className="ml-1 text-muted/70">({field.relation.type})</span>
-                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => onNavigate(
+                                                fieldSectionId(field.relation!.model, field.relation!.field)
+                                            )}
+                                            className="mt-1 inline-flex items-center gap-1 font-mono text-[11px] text-muted transition-colors hover:text-accent"
+                                        >
+                                            <ArrowRight className="h-3 w-3 shrink-0" strokeWidth={2} />
+                                            <span>{field.relation.model}.{field.relation.field}</span>
+                                            <span className="text-muted/60">({field.relation.type})</span>
+                                        </button>
                                     )}
                                 </td>
                                 <td className="px-3 py-2">

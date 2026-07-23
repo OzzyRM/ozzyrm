@@ -1,13 +1,14 @@
 import type { DocModel } from "@reldoc/core";
 import { sectionId } from "@/lib/section-id";
-import { Badge } from "./ui/badge";
 import { FieldsTable } from "./fields-table";
+import { ReferenceLink } from "./reference-link";
 
 interface ModelDetailProps {
     model: DocModel;
+    onNavigate: (id: string) => void;
 }
 
-export function ModelDetail({ model }: ModelDetailProps) {
+export function ModelDetail({ model, onNavigate }: ModelDetailProps) {
     return (
         <section
             id={sectionId("model", model.name)}
@@ -34,11 +35,13 @@ export function ModelDetail({ model }: ModelDetailProps) {
             </div>
 
             {model.referencedBy.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-1.5">
+                <div className="mt-4 flex flex-wrap gap-2">
                     {model.referencedBy.map((ref) => (
-                        <Badge
+                        <ReferenceLink
                             key={`${ref.model}.${ref.field}`}
-                            label={`${ref.model}.${ref.field}`}
+                            model={ref.model}
+                            field={ref.field}
+                            onNavigate={onNavigate}
                         />
                     ))}
                 </div>
@@ -64,7 +67,11 @@ export function ModelDetail({ model }: ModelDetailProps) {
 
             <div className="mt-6">
                 <h3 className="mb-3 text-[12px] font-medium text-muted">Fields</h3>
-                <FieldsTable fields={model.fields} />
+                <FieldsTable
+                    fields={model.fields}
+                    modelName={model.name}
+                    onNavigate={onNavigate}
+                />
             </div>
         </section>
     );

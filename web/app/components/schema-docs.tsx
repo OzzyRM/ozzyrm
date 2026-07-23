@@ -12,6 +12,13 @@ interface SchemaDocsProps {
     schema: DocSchema;
 }
 
+function highlightTarget(target: HTMLElement) {
+    target.dataset.highlight = "true";
+    window.setTimeout(() => {
+        delete target.dataset.highlight;
+    }, 1800);
+}
+
 export function SchemaDocs({ schema }: SchemaDocsProps) {
     const mainRef = useRef<HTMLElement>(null);
     const [activeId, setActiveId] = useState(sectionId("overview"));
@@ -31,6 +38,8 @@ export function SchemaDocs({ schema }: SchemaDocsProps) {
             top: target.offsetTop - 16,
             behavior: "smooth",
         });
+
+        highlightTarget(target);
 
         window.setTimeout(() => {
             isScrollingRef.current = false;
@@ -83,7 +92,11 @@ export function SchemaDocs({ schema }: SchemaDocsProps) {
                     <SchemaOverview schema={schema} />
 
                     {schema.models.map((model) => (
-                        <ModelDetail key={model.name} model={model} />
+                        <ModelDetail
+                            key={model.name}
+                            model={model}
+                            onNavigate={scrollToSection}
+                        />
                     ))}
 
                     {schema.enums.map((enumDef) => (
