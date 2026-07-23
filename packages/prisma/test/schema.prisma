@@ -26,6 +26,6 @@ model Post {
 }
 
 enum Role {
-  USER
-  ADMIN
+  USER @map("user")
+  ADMIN @map("admin")
 }
