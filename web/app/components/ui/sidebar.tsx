@@ -1,7 +1,12 @@
 "use client";
 
 import type { DocSchema } from "@reldoc/core";
+import { Search, X } from "lucide-react";
+import Image from "next/image";
+import { useMemo, useState } from "react";
+import { searchSchema } from "@/lib/search-schema";
 import { sectionId } from "@/lib/section-id";
+import { useDebouncedValue } from "@/lib/use-debounced-value";
 
 export interface NavSection {
     id: string;
@@ -24,25 +29,32 @@ function NavLink({
     active,
     onClick,
     nested,
+    suffix,
 }: {
     label: string;
     active: boolean;
     onClick: () => void;
     nested?: boolean;
+    suffix?: string;
 }) {
     return (
         <button
             type="button"
             onClick={onClick}
             className={`relative w-full truncate py-1 text-left text-[13px] transition-colors ${
-                nested ? "pl-3" : "pl-2"
+                nested ? "pl-5" : "pl-2"
             } ${
                 active
                     ? "font-medium text-foreground before:absolute before:left-0 before:top-1/2 before:h-3.5 before:w-0.5 before:-translate-y-1/2 before:rounded-full before:bg-accent"
                     : "text-muted hover:text-foreground"
             }`}
         >
-            {label}
+            <span className="font-mono">{label}</span>
+            {suffix && (
+                <span className="ml-1.5 text-[10px] uppercase tracking-wide text-muted/70">
+                    {suffix}
+                </span>
+            )}
         </button>
     );
 }
@@ -78,44 +90,109 @@ export function buildNavGroups(schema: DocSchema): NavGroup[] {
     return groups;
 }
 
+const TYPE_SUFFIX: Record<string, string | undefined> = {
+    field: "field",
+    enumValue: "value",
+};
+
 export function Sidebar({ schema, activeId, onNavigate }: SidebarProps) {
+    const [query, setQuery] = useState("");
+    const debouncedQuery = useDebouncedValue(query);
     const groups = buildNavGroups(schema);
 
+    const searchGroups = useMemo(
+        () => searchSchema(schema, debouncedQuery),
+        [schema, debouncedQuery]
+    );
+
+    const isSearching = debouncedQuery.trim().length > 0;
+
     return (
-        <aside className="flex w-[220px] shrink-0 flex-col border-r border-border bg-sidebar">
-            <div className="border-b border-border px-4 py-3">
-                <div className="flex items-center gap-2">
-                    <span className="text-[13px] font-semibold tracking-tight">Reldoc</span>
+        <aside className="flex w-[240px] shrink-0 flex-col border-r border-border bg-sidebar">
+            <div className="border-b border-border px-3 py-3">
+                <div className="flex items-center gap-2 px-1">
+                    <Image
+                        src="/logo.svg"
+                        alt="Reldoc"
+                        width={28}
+                        height={28}
+                        className="h-7 w-7 shrink-0"
+                        priority
+                    />
                     <span className="rounded border border-border px-1.5 py-px font-mono text-[10px] uppercase text-muted">
                         {schema.orm}
                     </span>
                 </div>
-                {schema.dataSource?.provider && (
-                    <p className="mt-1 font-mono text-[11px] text-muted">
-                        {schema.dataSource.provider}
-                    </p>
-                )}
+
+                <div className="relative mt-3">
+                    <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted" />
+                    <input
+                        type="search"
+                        value={query}
+                        onChange={(event) => setQuery(event.target.value)}
+                        placeholder="Search models, fields..."
+                        className="w-full rounded-md border border-border bg-background py-1.5 pl-8 pr-8 text-[13px] text-foreground outline-none transition-colors placeholder:text-muted focus:border-accent/40"
+                    />
+                    {query && (
+                        <button
+                            type="button"
+                            onClick={() => setQuery("")}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted transition-colors hover:text-foreground"
+                            aria-label="Clear search"
+                        >
+                            <X className="h-3.5 w-3.5" />
+                        </button>
+                    )}
+                </div>
             </div>
 
             <nav className="flex-1 overflow-y-auto px-3 py-3">
-                {groups.map((group) => (
-                    <div key={group.title} className="mb-4 last:mb-0">
-                        <p className="mb-1.5 px-2 text-[11px] font-medium uppercase tracking-wider text-muted">
-                            {group.title}
+                {isSearching ? (
+                    searchGroups.length > 0 ? (
+                        searchGroups.map((group) => (
+                            <div key={group.title} className="mb-4 last:mb-0">
+                                <p className="mb-1.5 px-2 text-[11px] font-medium uppercase tracking-wider text-muted">
+                                    {group.title}
+                                </p>
+                                <div className="space-y-0.5">
+                                    {group.items.map((item) => (
+                                        <NavLink
+                                            key={item.id}
+                                            label={item.label}
+                                            active={activeId === item.id}
+                                            nested={item.depth === 1}
+                                            suffix={TYPE_SUFFIX[item.type]}
+                                            onClick={() => onNavigate(item.id)}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="px-2 py-6 text-center text-[12px] text-muted">
+                            No results for &ldquo;{debouncedQuery}&rdquo;
                         </p>
-                        <div className="space-y-0.5">
-                            {group.items.map((item) => (
-                                <NavLink
-                                    key={item.id}
-                                    label={item.label}
-                                    active={activeId === item.id}
-                                    nested={group.title !== "Introduction"}
-                                    onClick={() => onNavigate(item.id)}
-                                />
-                            ))}
+                    )
+                ) : (
+                    groups.map((group) => (
+                        <div key={group.title} className="mb-4 last:mb-0">
+                            <p className="mb-1.5 px-2 text-[11px] font-medium uppercase tracking-wider text-muted">
+                                {group.title}
+                            </p>
+                            <div className="space-y-0.5">
+                                {group.items.map((item) => (
+                                    <NavLink
+                                        key={item.id}
+                                        label={item.label}
+                                        active={activeId === item.id}
+                                        nested={group.title !== "Introduction"}
+                                        onClick={() => onNavigate(item.id)}
+                                    />
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    ))
+                )}
             </nav>
         </aside>
     );
