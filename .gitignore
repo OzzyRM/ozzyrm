@@ -11,11 +11,10 @@ dist
 /web
 /test
 /scripts
+/fixtures
 ozzyrm.config.ts
 
 # local parser fixtures (kept on disk for generate, not in repo)
-/prisma/test
-/drizzle/test
 
 # code coverage
 coverage
