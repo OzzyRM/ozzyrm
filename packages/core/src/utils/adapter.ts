@@ -1,6 +1,6 @@
 export interface OrmDocgenAdapter {
     orm: "prisma" | "drizzle";
-    /** schema file paths, or a prisma schema directory for multi-file schemas */
+    /** schema file paths, prisma schema directory, or drizzle entry file / directory */
     include: string[];
     extension?: string;
     output?: string;
