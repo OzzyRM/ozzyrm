@@ -5,10 +5,12 @@ import { ReferenceLink } from "./reference-link";
 
 interface ModelDetailProps {
     model: DocModel;
+    modelNames: Set<string>;
+    enumNames: Set<string>;
     onNavigate: (id: string) => void;
 }
 
-export function ModelDetail({ model, onNavigate }: ModelDetailProps) {
+export function ModelDetail({ model, modelNames, enumNames, onNavigate }: ModelDetailProps) {
     return (
         <section
             id={sectionId("model", model.name)}
@@ -70,6 +72,8 @@ export function ModelDetail({ model, onNavigate }: ModelDetailProps) {
                 <FieldsTable
                     fields={model.fields}
                     modelName={model.name}
+                    modelNames={modelNames}
+                    enumNames={enumNames}
                     onNavigate={onNavigate}
                 />
             </div>

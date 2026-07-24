@@ -7,6 +7,7 @@ import { sectionId } from "@/lib/section-id";
 import { findActiveTargetId } from "@/lib/scroll-spy";
 import { highlightElement, scrollContainerToTarget } from "@/lib/scroll-to-target";
 import { EnumDetail } from "./enum-detail";
+import { GlossaryProvider } from "./glossary-provider";
 import { ModelDetail } from "./model-detail";
 import { SchemaOverview } from "./schema-overview";
 import { Sidebar } from "./ui/sidebar";
@@ -98,8 +99,12 @@ export function SchemaDocs({ catalog, defaultSchemaId }: SchemaDocsProps) {
         );
     }
 
+    const modelNames = new Set(schema.models.map((model) => model.name));
+    const enumNames = new Set(schema.enums.map((enumDef) => enumDef.name));
+
     return (
-        <div className="flex h-screen overflow-hidden bg-background text-foreground">
+        <GlossaryProvider>
+            <div className="flex h-screen overflow-hidden bg-background text-foreground">
             <SourceSidebar
                 catalog={catalog}
                 activeSchemaId={activeSchemaId}
@@ -120,6 +125,8 @@ export function SchemaDocs({ catalog, defaultSchemaId }: SchemaDocsProps) {
                         <ModelDetail
                             key={model.name}
                             model={model}
+                            modelNames={modelNames}
+                            enumNames={enumNames}
                             onNavigate={scrollToSection}
                         />
                     ))}
@@ -129,6 +136,7 @@ export function SchemaDocs({ catalog, defaultSchemaId }: SchemaDocsProps) {
                     ))}
                 </div>
             </main>
-        </div>
+            </div>
+        </GlossaryProvider>
     );
 }
