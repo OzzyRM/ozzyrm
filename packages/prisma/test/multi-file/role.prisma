@@ -1,0 +1,4 @@
+enum Role {
+  USER @map("user")
+  ADMIN @map("admin")
+}
