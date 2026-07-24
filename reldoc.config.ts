@@ -37,5 +37,12 @@ export default defineProject({
             orm: "drizzle",
             include: ["./packages/drizzle/test/schema.ts"],
         },
+        {
+            id: "schema-drizzle-multi-1-0-0",
+            file: "multi-file",
+            version: "1.0.0",
+            orm: "drizzle",
+            include: ["./packages/drizzle/test/multi-file/schema.ts"],
+        },
     ],
 });
