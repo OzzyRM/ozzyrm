@@ -5,10 +5,17 @@ node_modules
 out
 dist
 *.tgz
-web/.next
+.ozzyrm
 
-# local consumer sandbox (not part of the library)
+# local playgrounds / consumer sandboxes (not published source)
+/web
 /test
+/scripts
+ozzyrm.config.ts
+
+# local parser fixtures (kept on disk for generate, not in repo)
+/prisma/test
+/drizzle/test
 
 # code coverage
 coverage

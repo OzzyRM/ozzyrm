@@ -1,0 +1,16 @@
+{
+  "name": "@ozzyrm/parser-prisma",
+  "version": "0.2.0",
+  "description": "Deprecated — use @ozzyrm/core (parsers bundled)",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@ozzyrm/core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

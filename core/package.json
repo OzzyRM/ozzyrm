@@ -1,0 +1,40 @@
+{
+  "name": "@ozzyrm/core",
+  "version": "0.2.0",
+  "description": "OzzyRM core — types, config, and built-in Prisma/Drizzle parsers",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./prisma": {
+      "types": "./dist/parsers/prisma/index.d.ts",
+      "default": "./dist/parsers/prisma/index.js"
+    },
+    "./drizzle": {
+      "types": "./dist/parsers/drizzle/index.d.ts",
+      "default": "./dist/parsers/drizzle/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "bun run build"
+  },
+  "dependencies": {
+    "@prisma/dmmf": "^7.0.0",
+    "@prisma/internals": "^7.0.0",
+    "typescript": "^5.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20"
+  }
+}
