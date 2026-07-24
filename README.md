@@ -5,17 +5,15 @@ Schema documentation toolkit for Prisma & Drizzle.
 ## Install
 
 ```bash
-bun add @ozzyrm/core @ozzyrm/react @ozzyrm/ui
-# or: npm i / pnpm add
+bun add ozzyrm
+# or: npm i ozzyrm / pnpm add ozzyrm
 ```
 
-Parsers are **bundled in `@ozzyrm/core`** — no separate prisma/drizzle packages needed.
-
-## Config
+## Usage
 
 ```ts
 // ozzyrm.config.ts
-import { defineProject, prisma, drizzle } from "@ozzyrm/core";
+import { defineProject, prisma, drizzle } from "ozzyrm";
 
 export default defineProject({
   output: "./.ozzyrm",
@@ -33,16 +31,20 @@ export default defineProject({
 });
 ```
 
-## Packages
+```tsx
+"use client";
+import { OzzyRMDocs } from "ozzyrm/react";
 
-| Package | Folder | Description |
-|---|---|---|
-| `@ozzyrm/core` | `core/` | Types, config, **Prisma + Drizzle parsers** |
-| `@ozzyrm/ui` | `ui/` | Docs UI core (`mount()`) |
-| `@ozzyrm/react` | `react/` | React wrapper `<OzzyRMDocs />` |
-| `@ozzyrm/cli` | `cli/` | CLI (`ozzyrm serve`) |
-| `@ozzyrm/parser-prisma` | `prisma/` | Deprecated re-export of core |
-| `@ozzyrm/parser-drizzle` | `drizzle/` | Deprecated re-export of core |
+export default function Page() {
+  return <OzzyRMDocs catalog={catalog} basePath="/" />;
+}
+```
+
+Optional lower-level API:
+
+```ts
+import { mount } from "ozzyrm/ui";
+```
 
 ## Develop
 
@@ -51,4 +53,4 @@ bun install
 bun run build
 ```
 
-Local playground (`web/`), generate scripts (`scripts/`), and `ozzyrm.config.ts` are gitignored — keep them on your machine for internal testing.
+Local playground (`web/`), generate scripts (`scripts/`), and `ozzyrm.config.ts` are gitignored.
