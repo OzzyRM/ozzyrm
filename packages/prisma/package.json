@@ -1,5 +1,5 @@
 {
-  "name": "@reldoc/parser-prisma",
+  "name": "@ozzyrm/parser-prisma",
   "version": "0.1.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -7,7 +7,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@reldoc/core": "workspace:*",
+    "@ozzyrm/core": "workspace:*",
     "@prisma/dmmf": "^7.0.0",
     "@prisma/internals": "^7.0.0"
   },

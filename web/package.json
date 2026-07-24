@@ -1,5 +1,5 @@
 {
-  "name": "@reldoc/web",
+  "name": "@ozzyrm/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,7 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@reldoc/core": "workspace:*",
+    "@ozzyrm/react": "workspace:*",
+    "@ozzyrm/ui": "workspace:*",
+    "@ozzyrm/core": "workspace:*",
     "lucide-react": "^1.26.0",
     "next": "16.2.10",
     "react": "19.2.4",

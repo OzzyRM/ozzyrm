@@ -1,10 +1,19 @@
 {
-  "name": "@reldoc/core",
+  "name": "@ozzyrm/core",
   "version": "0.1.0",
+  "description": "OzzyRM schema types and config helpers",
+  "license": "MIT",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "prepublishOnly": "bun run build"
   },
   "devDependencies": {
     "typescript": "^5.4.0"
