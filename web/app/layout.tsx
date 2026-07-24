@@ -15,8 +15,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Reldoc — Schema Documentation",
-    description: "Live schema documentation for Prisma and Drizzle",
+    title: "OzzyRM",
+    description: "Live schema documentation",
 };
 
 export default function RootLayout({

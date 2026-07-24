@@ -108,7 +108,7 @@ export function SourceSidebar({
                 <div className={`flex items-center ${collapsed ? "justify-center" : ""}`}>
                     <Image
                         src="/logo.svg"
-                        alt="Reldoc"
+                        alt="OzzyRM"
                         width={28}
                         height={28}
                         className="h-7 w-7 shrink-0"

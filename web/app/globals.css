@@ -8,6 +8,8 @@
   --muted: #8a8f98;
   --accent: #6366f1;
   --code-bg: #f4f4f5;
+  --sheet-duration: 400ms;
+  --sheet-ease: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 @theme inline {
@@ -47,4 +49,29 @@ body {
 
 ::selection {
   background: color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.sheet-backdrop {
+  opacity: 0;
+  transition: opacity var(--sheet-duration) var(--sheet-ease);
+}
+
+.sheet-backdrop[data-open="true"] {
+  opacity: 1;
+}
+
+.sheet-panel {
+  transform: translate3d(100%, 0, 0);
+  transition: transform var(--sheet-duration) var(--sheet-ease);
+  will-change: transform;
+}
+
+.sheet-panel[data-open="true"] {
+  transform: translate3d(0, 0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --sheet-duration: 1ms;
+  }
 }
