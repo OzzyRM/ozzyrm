@@ -240,6 +240,12 @@ export async function getWatchedPaths(): Promise<string[]> {
             continue;
         }
 
+        if (source.orm === "drizzle") {
+            const { expandDrizzleWatchPaths } = await import("@reldoc/parser-drizzle");
+            paths.push(...await expandDrizzleWatchPaths(resolved));
+            continue;
+        }
+
         paths.push(...resolved);
     }
 

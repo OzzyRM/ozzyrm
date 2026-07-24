@@ -5,6 +5,7 @@ import schema_prisma_2_0_0 from "../../schemas/schema-prisma-2-0-0.json";
 import schema_prisma_3_0_0 from "../../schemas/schema-prisma-3-0-0.json";
 import schema_prisma_multi_1_0_0 from "../../schemas/schema-prisma-multi-1-0-0.json";
 import schema_drizzle_1_0_0 from "../../schemas/schema-drizzle-1-0-0.json";
+import schema_drizzle_multi_1_0_0 from "../../schemas/schema-drizzle-multi-1-0-0.json";
 
 export interface SchemaCatalogVersion {
   id: string;
@@ -51,6 +52,11 @@ export const schemaCatalog: SchemaCatalogGroup[] = [
         id: "schema-prisma-multi-1-0-0",
         version: "v1.0.0",
         schema: schema_prisma_multi_1_0_0 as DocSchema,
+      },
+      {
+        id: "schema-drizzle-multi-1-0-0",
+        version: "v1.0.0",
+        schema: schema_drizzle_multi_1_0_0 as DocSchema,
       }
     ],
   },
