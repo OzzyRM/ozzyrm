@@ -1,5 +1,5 @@
 import { watch } from "fs";
-import { generateSchema, getWatchedPaths } from "./lib/schema";
+import { generateAllSchemas, getWatchedPaths } from "./lib/schema";
 
 let timer: ReturnType<typeof setTimeout> | undefined;
 
@@ -7,8 +7,8 @@ async function regenerate(label: string) {
     clearTimeout(timer);
     timer = setTimeout(async () => {
         try {
-            const destination = await generateSchema();
-            console.log(`[reldoc] ${label} → updated ${destination}`);
+            const destinations = await generateAllSchemas();
+            console.log(`[reldoc] ${label} → updated ${destinations.length} schema(s)`);
         } catch (error) {
             console.error("[reldoc] generate failed:", error instanceof Error ? error.message : error);
         }
