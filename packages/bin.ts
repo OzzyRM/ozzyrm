@@ -3,7 +3,7 @@ import { writeSchema, postProcess } from "./core/src/process";
 import type { OrmDocgenAdapter, SupportedORMs } from "./core/src/utils";
 
 async function loadConfig(): Promise<OrmDocgenAdapter> {
-    const configPath = resolve(process.cwd(), "reldoc.config.ts");
+    const configPath = resolve(process.cwd(), "ozzyrm.config.ts");
     const mod = await import(configPath);
     return mod.default ?? mod;
 };
@@ -11,7 +11,7 @@ async function loadConfig(): Promise<OrmDocgenAdapter> {
 async function loadParserForConfig(orm: SupportedORMs) {
     switch(orm) {
         case "prisma":
-            const { PrismaParser } = await import("@reldoc/parser-prisma"); 
+            const { PrismaParser } = await import("@ozzyrm/parser-prisma"); 
         case "drizzle":
             const {  }
     }
