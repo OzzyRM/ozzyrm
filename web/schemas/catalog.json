@@ -32,6 +32,11 @@
           "id": "schema-prisma-multi-1-0-0",
           "version": "v1.0.0",
           "file": "schema-prisma-multi-1-0-0.json"
+        },
+        {
+          "id": "schema-drizzle-multi-1-0-0",
+          "version": "v1.0.0",
+          "file": "schema-drizzle-multi-1-0-0.json"
         }
       ]
     },
