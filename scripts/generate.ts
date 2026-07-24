@@ -1,8 +1,11 @@
-import { generateSchema } from "./lib/schema";
+import { generateAllSchemas } from "./lib/schema";
 
 async function main() {
-    const destination = await generateSchema();
-    console.log(`Generated schema → ${destination}`);
+    const destinations = await generateAllSchemas();
+    console.log(`Generated ${destinations.length} schema(s):`);
+    for (const path of destinations) {
+        console.log(`  ${path}`);
+    }
 }
 
 main().catch((error) => {
