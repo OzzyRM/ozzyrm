@@ -1,12 +1,13 @@
 "use client";
 
 import type { DocSchema } from "@reldoc/core";
-import { Search, X } from "lucide-react";
-import Image from "next/image";
-import { useMemo, useState } from "react";
+import { Search } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { searchSchema } from "@/lib/search-schema";
 import { sectionId } from "@/lib/section-id";
+import { resolveSidebarActiveId } from "@/lib/scroll-spy";
 import { useDebouncedValue } from "@/lib/use-debounced-value";
+import { X } from "lucide-react";
 
 export interface NavSection {
     id: string;
@@ -37,8 +38,22 @@ function NavLink({
     nested?: boolean;
     suffix?: string;
 }) {
+    const ref = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        if (!active || !ref.current) {
+            return;
+        }
+
+        ref.current.scrollIntoView({
+            block: "nearest",
+            behavior: "smooth",
+        });
+    }, [active]);
+
     return (
         <button
+            ref={ref}
             type="button"
             onClick={onClick}
             className={`relative w-full truncate py-1 text-left text-[13px] transition-colors ${
@@ -99,6 +114,7 @@ export function Sidebar({ schema, activeId, onNavigate }: SidebarProps) {
     const [query, setQuery] = useState("");
     const debouncedQuery = useDebouncedValue(query);
     const groups = buildNavGroups(schema);
+    const sidebarActiveId = resolveSidebarActiveId(activeId, schema);
 
     const searchGroups = useMemo(
         () => searchSchema(schema, debouncedQuery),
@@ -108,30 +124,15 @@ export function Sidebar({ schema, activeId, onNavigate }: SidebarProps) {
     const isSearching = debouncedQuery.trim().length > 0;
 
     return (
-        <aside className="flex w-[240px] shrink-0 flex-col border-r border-border bg-sidebar">
-            <div className="border-b border-border px-3 py-3">
-                <div className="flex items-center gap-2 px-1">
-                    <Image
-                        src="/logo.svg"
-                        alt="Reldoc"
-                        width={28}
-                        height={28}
-                        className="h-7 w-7 shrink-0"
-                        priority
-                    />
-                    <span className="rounded border border-border px-1.5 py-px font-mono text-[10px] uppercase text-muted">
-                        {schema.orm}
-                    </span>
-                </div>
-
-                <div className="relative mt-3">
+        <aside className="flex w-[240px] shrink-0 flex-col border-r border-border bg-background">
+            <div className="px-3 py-3">
+                <div className="relative">
                     <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted" />
                     <input
-                        type="search"
                         value={query}
                         onChange={(event) => setQuery(event.target.value)}
                         placeholder="Search models, fields..."
-                        className="w-full rounded-md border border-border bg-background py-1.5 pl-8 pr-8 text-[13px] text-foreground outline-none transition-colors placeholder:text-muted focus:border-accent/40"
+                        className="w-full rounded-md border border-border bg-background py-1.5 pl-8 pr-3 text-[13px] text-foreground outline-none transition-colors placeholder:text-muted focus:border-accent/40 [&::-webkit-search-cancel-button]:cursor-pointer"
                     />
                     {query && (
                         <button
@@ -184,7 +185,7 @@ export function Sidebar({ schema, activeId, onNavigate }: SidebarProps) {
                                     <NavLink
                                         key={item.id}
                                         label={item.label}
-                                        active={activeId === item.id}
+                                        active={sidebarActiveId === item.id}
                                         nested={group.title !== "Introduction"}
                                         onClick={() => onNavigate(item.id)}
                                     />
