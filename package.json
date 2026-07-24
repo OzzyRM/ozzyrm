@@ -1,28 +1,59 @@
 {
-  "name": "ozzyrm-monorepo",
-  "private": true,
-  "type": "module",
-  "workspaces": [
-    "cli",
-    "core",
-    "drizzle",
-    "prisma",
-    "react",
-    "ui"
+  "name": "ozzyrm",
+  "version": "0.1.0",
+  "description": "Schema documentation toolkit for Prisma & Drizzle",
+  "license": "MIT",
+  "bin": {
+    "ozzyrm": "./dist/cli/bin.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "default": "./dist/react/index.js"
+    },
+    "./ui": {
+      "types": "./dist/ui/index.d.ts",
+      "default": "./dist/ui/index.js"
+    },
+    "./styles.css": "./src/ui/styles.css"
+  },
+  "files": [
+    "dist",
+    "src/ui/styles.css"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "bun run build",
     "generate": "bun run scripts/generate.ts",
     "dev": "bun run scripts/dev.ts",
     "dev:web": "bun run --cwd web dev",
-    "watch:schema": "bun run scripts/watch-schema.ts",
-    "build": "bun run --cwd core build && bun run --cwd prisma build && bun run --cwd drizzle build && bun run --cwd ui build && bun run --cwd react build && bun run --cwd cli build"
+    "watch:schema": "bun run scripts/watch-schema.ts"
+  },
+  "dependencies": {
+    "@prisma/dmmf": "^7.0.0",
+    "@prisma/internals": "^7.0.0",
+    "lucide-react": "^1.26.0",
+    "typescript": "^5.4.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/node": "^26.1.0",
-    "@ozzyrm/core": "workspace:*"
-  },
-  "peerDependencies": {
-    "typescript": "^6.0.3"
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   }
 }
