@@ -1,5 +1,6 @@
 export interface OrmDocgenAdapter {
     orm: "prisma" | "drizzle";
+    /** schema file paths, or a prisma schema directory for multi-file schemas */
     include: string[];
     extension?: string;
     output?: string;
@@ -14,19 +15,40 @@ export interface OrmDocgenAdapter {
         models?: Record<string, { description?: string }>;
         fields?: Record<string, Record<string, { description?: string }>>;
     };
-};
+}
 
-/**
- * 
- * @param config 
- * @returns config
- * Returns a defined config within the defined interface (OrmDocgenAdapter)
- */
+export interface ReldocSchemaSource extends OrmDocgenAdapter {
+    id: string;
+    label?: string;
+    /** display name in source sidebar; defaults to basename of first include path */
+    file?: string;
+    /** semver label shown as v1.0.0; defaults to 1.0.0 */
+    version?: string;
+}
+
+export interface ReldocProjectConfig {
+    output?: string;
+    schemas: ReldocSchemaSource[];
+}
+
 export function defineConfig(config: OrmDocgenAdapter): OrmDocgenAdapter {
     return {
-        output: ".reldoc", // Default output path
-        servePort: 3000, // Default serve port
-        serveRoute: "/schema", // Default serve route
+        output: ".reldoc",
+        servePort: 3000,
+        serveRoute: "/schema",
         ...config,
     };
-};
+}
+
+export function defineProject(config: ReldocProjectConfig): ReldocProjectConfig {
+    return {
+        output: "./web/schemas",
+        ...config,
+    };
+}
+
+export function isProjectConfig(
+    config: OrmDocgenAdapter | ReldocProjectConfig
+): config is ReldocProjectConfig {
+    return "schemas" in config;
+}

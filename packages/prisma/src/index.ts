@@ -1,8 +1,8 @@
-import { readFile } from "fs/promises";
-import { getConfig, getDMMF } from "@prisma/internals";
+import { version as prismaVersion } from "@prisma/internals";
 import type { Parser, OrmDocgenAdapter, DocSchema, ProviderEnums } from "@reldoc/core";
 import { mapEnum } from "./map-enum";
 import { mapModel } from "./map-model";
+import { loadPrismaSchema, parsePrismaDatamodel } from "./load-schema";
 
 const PROVIDERS = new Set<ProviderEnums>([
     "postgresql",
@@ -13,18 +13,12 @@ const PROVIDERS = new Set<ProviderEnums>([
     "cockroachdb",
 ]);
 
+export { expandPrismaWatchPaths, loadPrismaSchema } from "./load-schema";
+
 export class PrismaParser implements Parser {
     async parse(adapter: OrmDocgenAdapter): Promise<DocSchema> {
-        const schemaPath = adapter.include[0];
-        if (!schemaPath) {
-            throw new Error("Prisma parser requires at least one schema path in adapter.include");
-        }
-
-        const schemaContent = await readFile(schemaPath, "utf-8");
-        const [dmmf, config] = await Promise.all([
-            getDMMF({ datamodel: schemaContent }),
-            getConfig({ datamodel: schemaContent }),
-        ]);
+        const { datamodel } = await loadPrismaSchema(adapter.include);
+        const { dmmf, config } = await parsePrismaDatamodel(datamodel);
 
         const enums = adapter.disabled?.enums
             ? []
@@ -41,24 +35,12 @@ export class PrismaParser implements Parser {
         return {
             generatedAt: new Date().toISOString(),
             orm: "prisma",
-            version: await readPrismaVersion(),
+            version: prismaVersion,
             dataSource: provider && PROVIDERS.has(provider as ProviderEnums)
                 ? { provider: provider as ProviderEnums }
                 : undefined,
             models,
             enums,
         };
-    }
-}
-
-async function readPrismaVersion(): Promise<string> {
-    try {
-        const { createRequire } = await import("module");
-        const require = createRequire(__filename);
-        const pkgPath = require.resolve("@prisma/internals/package.json");
-        const content = await readFile(pkgPath, "utf-8");
-        return JSON.parse(content).version as string;
-    } catch {
-        return "unknown";
     }
 }
