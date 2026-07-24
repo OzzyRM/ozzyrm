@@ -1,6 +1,6 @@
 {
   "name": "ozzyrm",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Schema documentation toolkit for Prisma & Drizzle",
   "license": "MIT",
   "bin": {
@@ -17,6 +17,10 @@
       "types": "./dist/react/index.d.ts",
       "default": "./dist/react/index.js"
     },
+    "./react/server": {
+      "types": "./dist/react/server.d.ts",
+      "default": "./dist/react/server.js"
+    },
     "./ui": {
       "types": "./dist/ui/index.d.ts",
       "default": "./dist/ui/index.js"
@@ -31,12 +35,9 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "prepublishOnly": "bun run build",
-    "generate": "bun run scripts/generate.ts",
-    "dev": "bun run scripts/dev.ts",
-    "dev:web": "bun run --cwd web dev",
-    "watch:schema": "bun run scripts/watch-schema.ts"
+    "build:css": "tailwindcss -i ./src/ui/styles.entry.css -o ./dist/ui/styles.bundled.css --minify && bun run scripts/inline-css.ts",
+    "build": "bun run build:css && tsc -p tsconfig.build.json",
+    "prepublishOnly": "bun run build"
   },
   "dependencies": {
     "@prisma/dmmf": "^7.0.0",
@@ -49,11 +50,13 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
     "@types/bun": "latest",
     "@types/node": "^26.1.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^4.3.3"
   }
 }
