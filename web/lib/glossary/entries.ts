@@ -157,7 +157,7 @@ export const GLOSSARY_ENTRIES: GlossaryEntry[] = [
         key: "pk",
         label: "PK",
         category: "attribute",
-        summary: "Primary key — uniquely identifies each row in a table.",
+        summary: "Primary key uniquely identifies each row in a table.",
         description:
             "Every table should have a primary key. It guarantees each record can be referenced unambiguously by relations and queries.",
         example: "id String @id",

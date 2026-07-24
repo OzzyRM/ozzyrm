@@ -1,4 +1,4 @@
-import type { DocSchema } from "@reldoc/core";
+import type { DocSchema } from "@ozzyrm/core";
 import type { SchemaCatalogGroup } from "./catalog.generated";
 
 export function findSchemaById(

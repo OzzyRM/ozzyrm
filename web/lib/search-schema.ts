@@ -1,4 +1,4 @@
-import type { DocSchema } from "@reldoc/core";
+import type { DocSchema } from "@ozzyrm/core";
 import { enumValueSectionId, fieldSectionId, sectionId } from "./section-id";
 
 export type SearchItemType = "model" | "enum" | "field" | "enumValue";
