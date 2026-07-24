@@ -5,6 +5,10 @@ node_modules
 out
 dist
 *.tgz
+web/.next
+
+# local consumer sandbox (not part of the library)
+/test
 
 # code coverage
 coverage
