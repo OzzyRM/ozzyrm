@@ -17,7 +17,7 @@ export interface OrmDocgenAdapter {
     };
 }
 
-export interface ReldocSchemaSource extends OrmDocgenAdapter {
+export interface OzzyRMSchemaSource extends OrmDocgenAdapter {
     id: string;
     label?: string;
     /** display name in source sidebar; defaults to basename of first include path */
@@ -26,21 +26,21 @@ export interface ReldocSchemaSource extends OrmDocgenAdapter {
     version?: string;
 }
 
-export interface ReldocProjectConfig {
+export interface OzzyRMProjectConfig {
     output?: string;
-    schemas: ReldocSchemaSource[];
+    schemas: OzzyRMSchemaSource[];
 }
 
 export function defineConfig(config: OrmDocgenAdapter): OrmDocgenAdapter {
     return {
-        output: ".reldoc",
+        output: ".ozzyrm",
         servePort: 3000,
         serveRoute: "/schema",
         ...config,
     };
 }
 
-export function defineProject(config: ReldocProjectConfig): ReldocProjectConfig {
+export function defineProject(config: OzzyRMProjectConfig): OzzyRMProjectConfig {
     return {
         output: "./web/schemas",
         ...config,
@@ -48,7 +48,7 @@ export function defineProject(config: ReldocProjectConfig): ReldocProjectConfig 
 }
 
 export function isProjectConfig(
-    config: OrmDocgenAdapter | ReldocProjectConfig
-): config is ReldocProjectConfig {
+    config: OrmDocgenAdapter | OzzyRMProjectConfig
+): config is OzzyRMProjectConfig {
     return "schemas" in config;
 }

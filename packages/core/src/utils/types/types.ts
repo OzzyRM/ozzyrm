@@ -14,7 +14,7 @@ export type IndexesArray = "BTree" | "Hash" | "Gist" | "Gin" | "SpGist" | "Brin"
 export type ProviderEnums = "postgresql" | "mysql" | "sqlite" | "sqlserver" | "mongodb" | "cockroachdb";
 
 /**
- * Supported ORMs for oDoc
+ * Supported ORMs for OzzyRM
  */
 export type SupportedORMs = "prisma" | "drizzle";
 
