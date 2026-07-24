@@ -1,15 +1,17 @@
 # OzzyRM
 
-Schema documentation toolkit for Prisma & Drizzle.
+Schema documentation toolkit for ORM's.
 
 ## Install
 
 ```bash
 bun add ozzyrm
-# or: npm i ozzyrm / pnpm add ozzyrm
+# or: npm i ozzyrm
 ```
 
-## Usage
+Styles inject automatically no CSS setup required.
+
+## Config (adapter)
 
 ```ts
 // ozzyrm.config.ts
@@ -31,19 +33,36 @@ export default defineProject({
 });
 ```
 
+## Next.js (App Router)
+
 ```tsx
-"use client";
-import { OzzyRMDocs } from "ozzyrm/react";
+// app/docs/page.tsx as Server Component
+import config from "../../ozzyrm.config";
+import { OzzyRMDocsFromConfig } from "ozzyrm/react/server";
 
 export default function Page() {
-  return <OzzyRMDocs catalog={catalog} basePath="/" />;
+  return <OzzyRMDocsFromConfig config={config} basePath="/docs" />;
 }
 ```
 
-Optional lower-level API:
+Or load the catalog yourself:
 
-```ts
-import { mount } from "ozzyrm/ui";
+```tsx
+import { loadCatalog } from "ozzyrm";
+import { OzzyRMDocs } from "ozzyrm/react";
+import config from "../ozzyrm.config";
+
+export default async function Page() {
+  const { catalog, defaultSchemaId } = await loadCatalog(config);
+  return <OzzyRMDocs catalog={catalog} defaultSchemaId={defaultSchemaId} />;
+}
+```
+
+## CLI
+
+```bash
+npx ozzyrm generate   # write ./.ozzyrm/*.json
+npx ozzyrm watch      # regenerate on schema change
 ```
 
 ## Develop
@@ -52,5 +71,3 @@ import { mount } from "ozzyrm/ui";
 bun install
 bun run build
 ```
-
-Local playground (`web/`), generate scripts (`scripts/`), and `ozzyrm.config.ts` are gitignored.
