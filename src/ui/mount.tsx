@@ -1,6 +1,7 @@
 import { createRoot, type Root } from "react-dom/client";
 import { createElement } from "react";
 import { SchemaDocs } from "./components/schema-docs";
+import { ensureOzzyrmStyles } from "./inject-styles";
 import type { OzzyRMDocsOptions } from "./types";
 
 export interface OzzyRMMountHandle {
@@ -10,12 +11,14 @@ export interface OzzyRMMountHandle {
 
 /**
  * Framework-agnostic mount (Swagger UI style).
- * Single source of truth for docs UI rendering.
+ * Styles are injected automatically on first mount.
  */
 export function mount(
     element: Element,
     options: OzzyRMDocsOptions
 ): OzzyRMMountHandle {
+    ensureOzzyrmStyles();
+
     let current: OzzyRMDocsOptions = { ...options };
     let root: Root | null = createRoot(element);
 

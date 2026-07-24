@@ -1,17 +1,10 @@
-import type { DocSchema } from "..";
+import type { SchemaCatalogGroup } from "../catalog/types";
 
-export interface SchemaCatalogVersion {
-    id: string;
-    version: string;
-    schema: DocSchema;
-}
-
-export interface SchemaCatalogGroup {
-    id: string;
-    file: string;
-    orm: DocSchema["orm"];
-    versions: SchemaCatalogVersion[];
-}
+export type {
+    SchemaCatalogGroup,
+    SchemaCatalogVersion,
+    LoadedCatalog,
+} from "../catalog/types";
 
 export interface OzzyRMDocsOptions {
     catalog: SchemaCatalogGroup[];

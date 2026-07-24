@@ -10,6 +10,7 @@ import {
     type MouseEvent as ReactMouseEvent,
 } from "react";
 import type { SchemaCatalogGroup } from "../../types";
+import { DEFAULT_LOGO_SRC } from "../../brand/default-logo";
 
 interface SourceSidebarProps {
     catalog: SchemaCatalogGroup[];
@@ -32,7 +33,7 @@ export function SourceSidebar({
     catalog,
     activeSchemaId,
     onSchemaChange,
-    logoSrc = "/logo.svg",
+    logoSrc = DEFAULT_LOGO_SRC,
 }: SourceSidebarProps) {
     const [collapsed, setCollapsed] = useState(false);
     const [width, setWidth] = useState(DEFAULT_WIDTH);
