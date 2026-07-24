@@ -1,4 +1,4 @@
-import type { DocModel } from "@reldoc/core";
+import type { DocModel } from "@ozzyrm/core";
 import type { ExtractedTable } from "../types/internal";
 import { mapColumn } from "./map-column";
 

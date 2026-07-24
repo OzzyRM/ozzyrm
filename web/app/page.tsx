@@ -1,11 +1,15 @@
-import { SchemaDocs } from "@/app/components/schema-docs";
+"use client";
+
+import { OzzyRMDocs } from "@ozzyrm/react";
 import { defaultSchemaId, schemaCatalog } from "@/lib/schema/schema.retrieve";
 
 export default function Home() {
     return (
-        <SchemaDocs
+        <OzzyRMDocs
             catalog={schemaCatalog}
             defaultSchemaId={defaultSchemaId}
+            basePath="/"
+            logoSrc="/logo.svg"
         />
     );
 }

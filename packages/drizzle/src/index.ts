@@ -1,5 +1,5 @@
 import { readFile } from "fs/promises";
-import type { DocModel, DocSchema, OrmDocgenAdapter, Parser } from "@reldoc/core";
+import type { DocModel, DocSchema, OrmDocgenAdapter, Parser } from "@ozzyrm/core";
 import { parseSchemaFile } from "./ast/parse-source";
 import { DRIZZLE_PARSER_VERSION } from "./constants";
 import { expandDrizzleWatchPaths, resolveDrizzleSchemaFiles } from "./load-schema";

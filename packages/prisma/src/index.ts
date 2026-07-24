@@ -1,5 +1,5 @@
 import { version as prismaVersion } from "@prisma/internals";
-import type { Parser, OrmDocgenAdapter, DocSchema, ProviderEnums } from "@reldoc/core";
+import type { Parser, OrmDocgenAdapter, DocSchema, ProviderEnums } from "@ozzyrm/core";
 import { mapEnum } from "./map-enum";
 import { mapModel } from "./map-model";
 import { loadPrismaSchema, parsePrismaDatamodel } from "./load-schema";

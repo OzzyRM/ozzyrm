@@ -1,4 +1,4 @@
-import type { DocEnum } from "@reldoc/core";
+import type { DocEnum } from "@ozzyrm/core";
 import type { ExtractedEnum } from "../types/internal";
 
 export function mapEnum(enumDef: ExtractedEnum): DocEnum {

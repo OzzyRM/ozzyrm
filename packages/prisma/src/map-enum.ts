@@ -1,5 +1,5 @@
 import type { DatamodelEnum as DmmfEnum } from "@prisma/dmmf";
-import type { DocEnum } from "@reldoc/core";
+import type { DocEnum } from "@ozzyrm/core";
 
 export function mapEnum(enumDef: DmmfEnum): DocEnum {
     return {

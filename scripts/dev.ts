@@ -32,5 +32,5 @@ const exited = await Promise.race([
     next.exited.then((code) => ({ proc: "next", code })),
 ]);
 
-console.error(`[reldoc] ${exited.proc} exited with code ${exited.code}`);
+console.error(`[ozzyrm] ${exited.proc} exited with code ${exited.code}`);
 shutdown(exited.code ?? 1);

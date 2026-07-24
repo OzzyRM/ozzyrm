@@ -1,5 +1,5 @@
 import type { Model, Index, IndexType } from "@prisma/dmmf";
-import type { DocModel, IndexesArray } from "@reldoc/core";
+import type { DocModel, IndexesArray } from "@ozzyrm/core";
 import { mapField } from "./map-field";
 
 const INDEX_TYPE_MAP: Partial<Record<IndexType, IndexesArray>> = {

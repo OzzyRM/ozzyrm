@@ -1,5 +1,5 @@
 import type { Field as DmmfField } from "@prisma/dmmf";
-import type { DocField, FieldDefault, FieldKind, FieldRelation, FieldType } from "@reldoc/core";
+import type { DocField, FieldDefault, FieldKind, FieldRelation, FieldType } from "@ozzyrm/core";
 
 const SCALAR_TYPE_MAP: Record<string, FieldType> = {
     String: "string",

@@ -8,9 +8,9 @@ async function regenerate(label: string) {
     timer = setTimeout(async () => {
         try {
             const destinations = await generateAllSchemas();
-            console.log(`[reldoc] ${label} → updated ${destinations.length} schema(s)`);
+            console.log(`[ozzyrm] ${label} → updated ${destinations.length} schema(s)`);
         } catch (error) {
-            console.error("[reldoc] generate failed:", error instanceof Error ? error.message : error);
+            console.error("[ozzyrm] generate failed:", error instanceof Error ? error.message : error);
         }
     }, 200);
 }
@@ -20,7 +20,7 @@ async function main() {
 
     for (const path of paths) {
         watch(path, () => regenerate(path));
-        console.log(`[reldoc] watching ${path}`);
+        console.log(`[ozzyrm] watching ${path}`);
     }
 
     await regenerate("initial");

@@ -1,4 +1,4 @@
-import type { DocField, FieldDefault, FieldKind, FieldRelation, FieldType } from "@reldoc/core";
+import type { DocField, FieldDefault, FieldKind, FieldRelation, FieldType } from "@ozzyrm/core";
 import {
     BOOLEAN_COLUMN_TYPES,
     DATE_COLUMN_TYPES,
