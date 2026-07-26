@@ -14,3 +14,14 @@ export {
 } from "./load-catalog";
 export { generate, type GenerateResult } from "./generate";
 export { watchCatalog, type WatchOptions } from "./watch";
+export {
+    mergeUnifiedSchema,
+    type MergeUnifiedInput,
+    type ParsedSourceEntry,
+} from "./merge-unified";
+export {
+    UnifiedSchemaValidationError,
+    formatDiagnostics,
+    type UnifiedDiagnostic,
+    type DiagnosticCode,
+} from "./validation";

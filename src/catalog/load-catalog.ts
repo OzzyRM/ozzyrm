@@ -1,9 +1,19 @@
 import type { Parser } from "../utils/pre/parser";
-import type { OrmDocgenAdapter, OzzyRMProjectConfig, OzzyRMSchemaSource } from "../utils/adapter";
+import type {
+    OrmDocgenAdapter,
+    OzzyRMProjectConfig,
+    OzzyRMSchemaSource,
+} from "../utils/adapter";
 import { isProjectConfig } from "../utils/adapter";
 import { postProcess } from "../process/post-process";
 import type { LoadedCatalog, SchemaCatalogGroup } from "./types";
 import { basename, resolve } from "path";
+import { mergeUnifiedSchema, type ParsedSourceEntry } from "./merge-unified";
+import {
+    UnifiedDiagnostic,
+    UnifiedSchemaValidationError,
+} from "./validation";
+
 export const DEFAULT_SCHEMA_VERSION = "1.0.0";
 
 export function schemaFileLabel(source: OzzyRMSchemaSource): string {
@@ -12,7 +22,10 @@ export function schemaFileLabel(source: OzzyRMSchemaSource): string {
     }
 
     const path = source.include[0] ?? source.id;
-    return basename(path).replace(/\.prisma$/i, "") || basename(path);
+    return basename(path)
+        .replace(/\.prisma$/i, "")
+        .replace(/\.sql$/i, "")
+        || basename(path);
 }
 
 export function normalizeVersion(version?: string): string {
@@ -33,8 +46,17 @@ async function loadParser(orm: OrmDocgenAdapter["orm"]): Promise<Parser> {
         return new PrismaParser();
     }
 
-    const { DrizzleParser } = await import("../parsers/drizzle");
-    return new DrizzleParser();
+    if (orm === "drizzle") {
+        const { DrizzleParser } = await import("../parsers/drizzle");
+        return new DrizzleParser();
+    }
+
+    if (orm === "sql") {
+        const { SqlParser } = await import("../parsers/sql");
+        return new SqlParser();
+    }
+
+    throw new Error(`Unsupported schema source: ${String(orm)}`);
 }
 
 function compareVersions(left: string, right: string): number {
@@ -62,6 +84,7 @@ export function normalizeProjectConfig(
         return {
             output: config.output ?? "./.ozzyrm",
             schemas: config.schemas,
+            unified: config.unified,
         };
     }
 
@@ -95,24 +118,41 @@ interface GeneratedEntry {
     schema: SchemaCatalogGroup["versions"][number]["schema"];
 }
 
-async function generateOne(
+async function parseSource(
     source: OzzyRMSchemaSource,
     cwd: string
-): Promise<GeneratedEntry> {
-    const parser = await loadParser(source.orm);
-    const include = source.include.map((path) => resolve(cwd, path));
-    const schema = await parser.parse({ ...source, include });
-    const processed = postProcess(schema, source);
+): Promise<ParsedSourceEntry> {
     const file = schemaFileLabel(source);
 
-    return {
-        id: source.id,
-        file,
-        groupId: schemaGroupId(file),
-        version: normalizeVersion(source.version),
-        orm: processed.orm,
-        schema: processed,
-    };
+    try {
+        const parser = await loadParser(source.orm);
+        const include = source.include.map((path) => resolve(cwd, path));
+        const schema = await parser.parse({ ...source, include });
+        const processed = postProcess(schema, source);
+
+        return {
+            id: source.id,
+            orm: source.orm,
+            label: source.label,
+            file,
+            schema: processed,
+        };
+    } catch (error) {
+        return {
+            id: source.id,
+            orm: source.orm,
+            label: source.label,
+            file,
+            schema: {
+                generatedAt: new Date().toISOString(),
+                orm: source.orm,
+                version: "0.0.0",
+                models: [],
+                enums: [],
+            },
+            parseError: error instanceof Error ? error.message : String(error),
+        };
+    }
 }
 
 function toCatalog(entries: GeneratedEntry[]): LoadedCatalog {
@@ -148,6 +188,98 @@ function toCatalog(entries: GeneratedEntry[]): LoadedCatalog {
     };
 }
 
+function validateProjectIds(project: OzzyRMProjectConfig): UnifiedDiagnostic[] {
+    const diagnostics: UnifiedDiagnostic[] = [];
+    const sourceIds = new Set<string>();
+
+    for (const source of project.schemas) {
+        if (sourceIds.has(source.id)) {
+            diagnostics.push({
+                code: "DUP_SOURCE_ID",
+                message: `duplicate schema source id "${source.id}"`,
+                sourceId: source.id,
+            });
+        }
+        sourceIds.add(source.id);
+    }
+
+    const groupIds = new Set<string>();
+    for (const group of project.unified ?? []) {
+        if (groupIds.has(group.id)) {
+            diagnostics.push({
+                code: "DUP_GROUP_ID",
+                message: `duplicate unified group id "${group.id}"`,
+                sourceId: group.id,
+            });
+        }
+        groupIds.add(group.id);
+    }
+
+    return diagnostics;
+}
+
+function buildUnifiedEntries(
+    project: OzzyRMProjectConfig,
+    parsed: ParsedSourceEntry[]
+): { entries: GeneratedEntry[]; consumedSourceIds: Set<string> } {
+    const diagnostics: UnifiedDiagnostic[] = [];
+    const entries: GeneratedEntry[] = [];
+    const consumedSourceIds = new Set<string>();
+    const claimedBy = new Map<string, string>();
+
+    for (const definition of project.unified ?? []) {
+        for (const sourceId of definition.sources) {
+            const previous = claimedBy.get(sourceId);
+            if (previous && previous !== definition.id) {
+                diagnostics.push({
+                    code: "DUP_SOURCE_ID",
+                    message: `source "${sourceId}" is claimed by unified groups "${previous}" and "${definition.id}"`,
+                    sourceId: definition.id,
+                    related: { sourceId: previous },
+                });
+            }
+            claimedBy.set(sourceId, definition.id);
+        }
+
+        try {
+            const schema = mergeUnifiedSchema({
+                definition,
+                members: parsed,
+            });
+            const file = definition.file ?? definition.id;
+
+            entries.push({
+                id: definition.id,
+                file,
+                groupId: schemaGroupId(file),
+                version: normalizeVersion(definition.version),
+                orm: "unified",
+                schema,
+            });
+
+            for (const sourceId of definition.sources) {
+                consumedSourceIds.add(sourceId);
+            }
+        } catch (error) {
+            if (error instanceof UnifiedSchemaValidationError) {
+                diagnostics.push(...error.diagnostics);
+            } else {
+                diagnostics.push({
+                    code: "SOURCE_PARSE_FAILED",
+                    message: error instanceof Error ? error.message : String(error),
+                    sourceId: definition.id,
+                });
+            }
+        }
+    }
+
+    if (diagnostics.length > 0) {
+        throw new UnifiedSchemaValidationError(diagnostics);
+    }
+
+    return { entries, consumedSourceIds };
+}
+
 /** Parse adapters from project config into a UI catalog (no generated .ts files). */
 export async function loadCatalog(
     config: OzzyRMProjectConfig | OrmDocgenAdapter,
@@ -155,8 +287,73 @@ export async function loadCatalog(
 ): Promise<LoadedCatalog> {
     const cwd = options?.cwd ?? process.cwd();
     const project = normalizeProjectConfig(config);
-    const entries = await Promise.all(
-        project.schemas.map((source) => generateOne(source, cwd))
+
+    const idDiagnostics = validateProjectIds(project);
+    if (idDiagnostics.length > 0) {
+        throw new UnifiedSchemaValidationError(idDiagnostics);
+    }
+
+    const settled = await Promise.allSettled(
+        project.schemas.map((source) => parseSource(source, cwd))
     );
-    return toCatalog(entries);
+
+    const parsed: ParsedSourceEntry[] = settled.map((result, index) => {
+        const source = project.schemas[index]!;
+        if (result.status === "fulfilled") {
+            return result.value;
+        }
+
+        return {
+            id: source.id,
+            orm: source.orm,
+            label: source.label,
+            file: schemaFileLabel(source),
+            schema: {
+                generatedAt: new Date().toISOString(),
+                orm: source.orm,
+                version: "0.0.0",
+                models: [],
+                enums: [],
+            },
+            parseError: result.reason instanceof Error
+                ? result.reason.message
+                : String(result.reason),
+        };
+    });
+
+    const unifiedSourceIds = new Set(
+        (project.unified ?? []).flatMap((group) => group.sources)
+    );
+    const standaloneParseErrors = parsed
+        .filter((entry) => !unifiedSourceIds.has(entry.id) && entry.parseError)
+        .map((entry) => ({
+            code: "SOURCE_PARSE_FAILED" as const,
+            message: entry.parseError!,
+            sourceId: entry.id,
+        }));
+
+    if (standaloneParseErrors.length > 0) {
+        throw new UnifiedSchemaValidationError(standaloneParseErrors);
+    }
+
+    const { entries: unifiedEntries, consumedSourceIds } = buildUnifiedEntries(
+        project,
+        parsed
+    );
+
+    const standaloneEntries: GeneratedEntry[] = parsed
+        .filter((entry) => !consumedSourceIds.has(entry.id) && !entry.parseError)
+        .map((entry) => ({
+            id: entry.id,
+            file: entry.file,
+            groupId: schemaGroupId(entry.file),
+            version: normalizeVersion(
+                project.schemas.find((source) => source.id === entry.id)?.version
+            ),
+            orm: entry.orm,
+            schema: entry.schema,
+        }));
+
+    const ordered = [...unifiedEntries, ...standaloneEntries];
+    return toCatalog(ordered);
 }
