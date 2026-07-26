@@ -14,9 +14,18 @@ export type IndexesArray = "BTree" | "Hash" | "Gist" | "Gin" | "SpGist" | "Brin"
 export type ProviderEnums = "postgresql" | "mysql" | "sqlite" | "sqlserver" | "mongodb" | "cockroachdb";
 
 /**
- * Supported ORMs for OzzyRM
+ * Supported schema sources for OzzyRM
  */
-export type SupportedORMs = "prisma" | "drizzle";
+export type SupportedORMs = "prisma" | "drizzle" | "sql" | "unified";
+
+/**
+ * Provenance for entities that come from a merged unified graph
+ */
+export interface SchemaSourceRef {
+    id: string;
+    orm: Exclude<SupportedORMs, "unified">;
+    label?: string;
+}
 
 /**
  * Support field relation
@@ -102,6 +111,9 @@ export interface DocModel {
 
     // @@Index
     indexes: Array<{ name?: string; fields: string[]; type?: IndexesArray }>
+
+    /** set when this model came from a unified merge member */
+    source?: SchemaSourceRef;
 };
 
 export interface DocEnum {
@@ -110,15 +122,19 @@ export interface DocEnum {
     dbName?: string;
     values: Array<{ name: string; dbName?: string }>;
     description?: string;
+    /** set when this enum came from a unified merge member */
+    source?: SchemaSourceRef;
 };
 
 export interface DocSchema {
     generatedAt: string;
     orm: SupportedORMs;
-    // ORM versioning helping drafted ORMs
+    // ORM versioning helping drafted ORMs / unified graph version label
     version: string;
     // **! FOR OUTPUT IS REDACTED !**
     dataSource?: { provider: ProviderEnums; url?: string };
     models: DocModel[];
     enums: DocEnum[];
+    /** member sources when orm === "unified" */
+    sources?: SchemaSourceRef[];
 };
