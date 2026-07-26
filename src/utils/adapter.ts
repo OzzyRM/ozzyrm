@@ -1,6 +1,6 @@
 export interface OrmDocgenAdapter {
-    orm: "prisma" | "drizzle";
-    /** schema file paths, prisma schema directory, or drizzle entry file / directory */
+    orm: "prisma" | "drizzle" | "sql";
+    /** schema file paths, directories (prisma/sql), or drizzle entry file */
     include: string[];
     extension?: string;
     output?: string;
@@ -26,9 +26,23 @@ export interface OzzyRMSchemaSource extends OrmDocgenAdapter {
     version?: string;
 }
 
+/** Explicit group that merges selected schema sources into one validated graph */
+export interface UnifiedSchemaDefinition {
+    id: string;
+    /** OzzyRMSchemaSource.id values to merge */
+    sources: string[];
+    label?: string;
+    /** display name in source sidebar; defaults to id */
+    file?: string;
+    /** semver label shown as v1.0.0; defaults to 1.0.0 */
+    version?: string;
+}
+
 export interface OzzyRMProjectConfig {
     output?: string;
     schemas: OzzyRMSchemaSource[];
+    /** optional unified graphs; member sources are removed from standalone sidebar entries */
+    unified?: UnifiedSchemaDefinition[];
 }
 
 export function defineConfig(config: OrmDocgenAdapter): OrmDocgenAdapter {

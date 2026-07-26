@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { generate, watchCatalog } from "../catalog";
+import { generate, watchCatalog, UnifiedSchemaValidationError } from "../catalog";
 import { serve } from "./serve";
 
 async function main() {
@@ -39,9 +39,10 @@ Usage:
   ozzyrm serve    --root <dir> [--port 4173] [--route /docs]
 
 Typical flow:
-  1. Create ozzyrm.config.ts with prisma()/drizzle() adapters
-  2. ozzyrm watch   # writes ./.ozzyrm/*.json on schema change
-  3. loadCatalog(config) in your app, or read .ozzyrm/catalog.json
+  1. Create ozzyrm.config.ts with prisma() / drizzle() / sql() adapters
+  2. Optionally add unified: [{ id, sources: [...] }] to merge sources
+  3. ozzyrm watch   # writes ./.ozzyrm/*.json on schema change
+  4. loadCatalog(config) in your app, or read .ozzyrm/catalog.json
 `);
 }
 
@@ -55,6 +56,10 @@ function getFlag(args: string[], name: string): string | undefined {
 }
 
 main().catch((error) => {
-    console.error(error instanceof Error ? error.message : error);
+    if (error instanceof UnifiedSchemaValidationError) {
+        console.error(error.message);
+    } else {
+        console.error(error instanceof Error ? error.message : error);
+    }
     process.exit(1);
 });
