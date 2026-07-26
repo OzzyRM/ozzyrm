@@ -8,6 +8,10 @@ export type DrizzleAdapterOptions = Omit<OzzyRMSchemaSource, "orm"> & {
     include: string[];
 };
 
+export type SqlAdapterOptions = Omit<OzzyRMSchemaSource, "orm"> & {
+    include: string[];
+};
+
 /** Built-in Prisma schema adapter for OzzyRM config */
 export function prisma(options: PrismaAdapterOptions): OzzyRMSchemaSource {
     return {
@@ -24,6 +28,16 @@ export function drizzle(options: DrizzleAdapterOptions): OzzyRMSchemaSource {
         ...options,
         orm: "drizzle",
         file: options.file ?? "schema.ts",
+        version: options.version ?? "1.0.0",
+    };
+}
+
+/** Built-in raw SQL DDL adapter for OzzyRM config */
+export function sql(options: SqlAdapterOptions): OzzyRMSchemaSource {
+    return {
+        ...options,
+        orm: "sql",
+        file: options.file ?? "schema.sql",
         version: options.version ?? "1.0.0",
     };
 }

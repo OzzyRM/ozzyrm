@@ -33,6 +33,12 @@ async function getWatchedPaths(
             continue;
         }
 
+        if (source.orm === "sql") {
+            const { expandSqlWatchPaths } = await import("../parsers/sql");
+            paths.push(...(await expandSqlWatchPaths(resolved)));
+            continue;
+        }
+
         paths.push(...resolved);
     }
 
@@ -55,7 +61,11 @@ export async function watchCatalog(options: WatchOptions = {}): Promise<{ close:
             console.log(`[ozzyrm] ${label} → ${result.files.length} file(s) in ${result.outputDir}`);
             options.onGenerate?.(result.files);
         } catch (error) {
-            console.error("[ozzyrm] generate failed:", error instanceof Error ? error.message : error);
+            // keep previous valid JSON on disk; report full diagnostics for unified failures
+            console.error(
+                "[ozzyrm] generate failed:",
+                error instanceof Error ? error.message : error
+            );
             options.onError?.(error);
         }
     };
