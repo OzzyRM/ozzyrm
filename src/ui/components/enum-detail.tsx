@@ -17,6 +17,11 @@ export function EnumDetail({ enumDef }: EnumDetailProps) {
                 {enumDef.dbName && (
                     <span className="font-mono text-[11px] text-muted">db: {enumDef.dbName}</span>
                 )}
+                {enumDef.source && (
+                    <span className="font-mono text-[11px] text-muted">
+                        from: {enumDef.source.id} ({enumDef.source.orm})
+                    </span>
+                )}
             </div>
 
             {enumDef.description && (

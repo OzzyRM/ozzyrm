@@ -22,6 +22,11 @@ export function ModelDetail({ model, modelNames, enumNames, onNavigate }: ModelD
                 {model.dbName && (
                     <span className="font-mono text-[11px] text-muted">table: {model.dbName}</span>
                 )}
+                {model.source && (
+                    <span className="font-mono text-[11px] text-muted">
+                        from: {model.source.id} ({model.source.orm})
+                    </span>
+                )}
             </div>
 
             {model.description && (
