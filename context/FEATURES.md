@@ -5,21 +5,28 @@
 - `defineProject()` and `defineConfig()` helpers
 - `prisma()` adapter: single file, directory, multi-file Prisma schemas
 - `drizzle()` adapter: entry file with import graph resolution
+- `sql()` adapter: raw `.sql` files or directories (CREATE TABLE / ENUM / INDEX / FK)
 - Per-source options: `id`, `version`, `file` label, `disabled` flags, `metadata` descriptions
+- Optional `unified: [{ id, sources, file?, version? }]` — merge selected sources into one graph
 - Default output directory: `./.ozzyrm`
 
 ## Parsing
 
 - Prisma: models, enums, fields, relations, indexes, defaults, `@map`, datasource provider, ORM version from `@prisma/internals`
 - Drizzle: tables, columns, enums, relations, multi-file projects
+- SQL: tables, columns, enums (`CREATE TYPE AS ENUM`), FK relations, indexes, defaults, compound keys
 - Post-processing: populate `referencedBy`, apply external metadata descriptions
+- Mixed catalogs: Prisma + Drizzle + SQL sources can appear side-by-side in one docs UI
+- Unified graphs: explicit merge groups with strict identity validation and cross-source relation resolution
 
 ## Catalog
 
-- `loadCatalog(config)` — runtime parse without writing files
-- `generate(config)` — JSON per schema + `catalog.json` manifest
-- `watchCatalog()` — debounced file watching on config and schema paths
+- `loadCatalog(config)` — runtime parse without writing files; rejects on unified validation errors
+- `generate(config)` — JSON per schema + `catalog.json` manifest (writes nothing on unified failure)
+- `watchCatalog()` — debounced file watching; logs unified diagnostics and keeps previous valid JSON
+- Unified entries replace consumed member sources in the sidebar
 - Version grouping in sidebar (multiple versions per schema file)
+- `mergeUnifiedSchema` / `UnifiedSchemaValidationError` for pure merge + structured diagnostics
 
 ## CLI
 
@@ -39,9 +46,9 @@
 
 - Collapsible source sidebar (schema file tree with versions)
 - Main nav sidebar with scroll spy
-- Schema overview section
-- Model detail: fields table, relations, indexes
-- Enum detail with values
+- Schema overview section (unified graphs show "Merged from" source list)
+- Model detail: fields table, relations, indexes (source attribution when unified)
+- Enum detail with values (source attribution when unified)
 - Bottom navigation on mobile/narrow layouts
 
 ### Search and glossary
@@ -66,7 +73,7 @@
 
 ## npm package surface
 
-Single package `ozzyrm@0.2.0` with subpath exports:
+Single package `ozzyrm@0.3.0` with subpath exports:
 
 - `.` — core API
 - `./react` — client components

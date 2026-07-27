@@ -13,13 +13,9 @@ Not implemented yet (explicitly deferred):
 
 Goal: backend teams serve `/docs` from the same process that owns the Prisma/Drizzle schema, without requiring Next.js.
 
-### Publish patch: built-in logo
-
-Source includes `src/ui/brand/default-logo.ts` (data URI default). Ensure published `0.2.x` tarball includes this so consumers do not need `public/logo.svg`.
-
 ### Documentation site
 
-Public docs (install guide, adapter reference, Next.js recipe, CLI reference) are only in root `README.md` and this `context/` folder. Consider a dedicated docs site or expanded README sections.
+Public docs (install guide, adapter reference, unified graphs, Next.js recipe, CLI reference) are only in root `README.md` and this `context/` folder. Consider a dedicated docs site or expanded README sections.
 
 ## Medium priority
 
@@ -45,11 +41,12 @@ Clarify and document the recommended dev loop for schema edits.
 
 ### Test coverage
 
-Parser fixtures exist under gitignored `fixtures/` but are not wired to CI. Add:
+Unified merge has Bun unit/integration tests (`src/catalog/merge-unified.test.ts`). Still missing:
 
 - Unit tests for Prisma single/multi-file parsing
 - Unit tests for Drizzle single/multi-file parsing
 - Snapshot tests for `DocSchema` output
+- CI wiring for `bun test`
 
 ### Dependency hygiene
 
@@ -58,9 +55,15 @@ Parser fixtures exist under gitignored `fixtures/` but are not wired to CI. Add:
 
 ## Lower priority
 
-### Additional ORMs
+### Additional ORMs and SQL dialects
 
-Only Prisma and Drizzle are supported. TypeORM, Sequelize, or Kysely would require new parser modules and adapter helpers.
+Supported sources today: Prisma, Drizzle, and raw SQL DDL (PostgreSQL-oriented with MySQL/SQLite-friendly constructs).
+
+Future extensions:
+
+- Broader SQL dialect coverage (SQL Server, richer MySQL ALTER forms)
+- TypeORM, Sequelize, or Kysely parser modules and adapter helpers
+- Optional introspection from a live database connection (out of scope for file-based docs today)
 
 ### Theming
 
@@ -87,10 +90,10 @@ When implementing improvements, do not reintroduce:
 
 ## Suggested implementation order
 
-1. Publish `0.2.1` with built-in logo fix if not in current tarball
+1. Publish `0.3.x` with SQL adapter + unified schema graphs
 2. Hono middleware adapter (smallest surface, popular in Bun ecosystem)
 3. Express middleware adapter
-4. CI + parser tests using `fixtures/`
+4. CI + broader parser tests using `fixtures/` (including `fixtures/sql`, `fixtures/unified`)
 5. Dev HMR documentation and optional `ozzyrm dev` command (watch + hint for Next reload)
 
 ## Agent notes on scope

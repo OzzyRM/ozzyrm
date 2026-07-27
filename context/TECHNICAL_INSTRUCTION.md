@@ -6,7 +6,7 @@ Published entry points (`package.json` exports):
 
 | Export | Role |
 |--------|------|
-| `ozzyrm` | Types, config helpers, parsers, `loadCatalog`, `generate`, `watchCatalog` |
+| `ozzyrm` | Types, config helpers, parsers (Prisma/Drizzle/SQL), `loadCatalog`, `generate`, `watchCatalog` |
 | `ozzyrm/react` | Client component `<OzzyRMDocs />` |
 | `ozzyrm/react/server` | Server helper `<OzzyRMDocsFromConfig />` and `loadCatalog` re-export |
 | `ozzyrm/ui` | Framework-agnostic `mount()`, `SchemaDocs`, catalog utilities |
@@ -19,12 +19,13 @@ CLI binary: `ozzyrm` maps to `dist/cli/bin.js`.
 ```
 src/
   index.ts              Public API re-exports
-  catalog/              loadCatalog, generate, watchCatalog
+  catalog/              loadCatalog, generate, watchCatalog, merge-unified, validation
   cli/                  bin, serve (static file server)
   parsers/
     prisma/             PrismaParser, load-schema, mappers
     drizzle/            DrizzleParser, AST extraction, mappers
-    adapters.ts         prisma(), drizzle() config helpers
+    sql/                SqlParser, DDL parse-source, mappers
+    adapters.ts         prisma(), drizzle(), sql() config helpers
   process/              postProcess, write-schema
   react/                OzzyRMDocs.tsx, server.ts
   ui/                   mount, components, styles, glossary
@@ -35,22 +36,27 @@ src/
 
 ```
 ozzyrm.config.ts
-  └── schemas: [ prisma({ include: [...] }), drizzle({ include: [...] }) ]
+  └── schemas: [prisma(), drizzle(), sql()]
+  └── unified?: [{ id, sources: [...] }]   // optional merge groups
         │
         ▼
   loadCatalog(config)  OR  generate(config)  OR  CLI ozzyrm watch
         │
         ▼
-  Parser (PrismaParser | DrizzleParser)
+  Parser (PrismaParser | DrizzleParser | SqlParser)  // per source, Promise.allSettled in groups
         │
         ▼
-  DocSchema (normalized JSON)
+  DocSchema (normalized JSON) per source
+        │
+        ▼
+  mergeUnifiedSchema (strict identity + relation validation)  // when unified configured
         │
         ▼
   postProcess (referencedBy, metadata descriptions)
         │
         ▼
   SchemaCatalogGroup[]  →  mount() / OzzyRMDocs
+      (unified entry replaces consumed member sources)
 ```
 
 ### DocSchema
@@ -59,9 +65,20 @@ The internal canonical format lives in `src/utils/types/types.ts`. Key entities:
 
 - `DocModel` with `DocField[]`, relations, indexes, `referencedBy`
 - `DocEnum` with values
-- ORM metadata: `orm`, `version`, `dataSource.provider`
+- Source metadata: `orm` (`prisma` | `drizzle` | `sql` | `unified`), `version`, `dataSource.provider`
+- Unified provenance: `DocSchema.sources`, optional `source` on models/enums
 
-Parsers map Prisma DMMF or Drizzle AST into this shape. UI components only consume `DocSchema`, never raw Prisma/Drizzle syntax.
+Parsers map Prisma DMMF, Drizzle AST, or SQL DDL into this shape. UI components only consume `DocSchema`, never raw source syntax.
+
+### Unified merge (catalog layer)
+
+Parsers stay pure. Cross-source validation lives in `src/catalog/merge-unified.ts` + `validation.ts`.
+
+- Alias registry: logical `name` plus physical `tableName` / `dbName` (normalized)
+- Duplicate identities always conflict (`DUP_MODEL`, `DUP_TABLE_NAME`, `DUP_ENUM`, …)
+- Relations resolve across members only when a single owner matches; also validate target fields
+- Aggregate diagnostics then throw `UnifiedSchemaValidationError`
+- Policy: `loadCatalog` / `generate` fail closed; `watch` logs and keeps previous JSON
 
 ## Parsers
 
@@ -77,6 +94,17 @@ Parsers map Prisma DMMF or Drizzle AST into this shape. UI components only consu
 - TypeScript AST parsing via custom extractors (`extract-tables`, `extract-enums`)
 - Resolves multi-file graphs via import following
 - Exports: `DrizzleParser`, `resolveDrizzleSchemaFiles`, `expandDrizzleWatchPaths`
+
+### SQL (raw DDL)
+
+- Lightweight statement-based DDL parser (no external SQL engine required)
+- Supports `CREATE TABLE`, `CREATE TYPE ... AS ENUM`, `CREATE INDEX`, inline / table-level `FOREIGN KEY`, and `ALTER TABLE ... ADD FOREIGN KEY`
+- Resolves single `.sql` files or directories of `.sql` files
+- Exports: `SqlParser`, `parseSqlSource`, `resolveSqlSchemaFiles`, `expandSqlWatchPaths`
+- Maps columns, enums, defaults, uniqueness, primary keys, and relations into the same `DocSchema` used by ORM adapters
+- Optional provider hint (e.g. MySQL `ENGINE=InnoDB`) when detectable
+
+Companies that mix ORMs with migration SQL or legacy dumps can document both sources in one catalog.
 
 ## UI layer
 
@@ -129,18 +157,28 @@ Consumers do not need Tailwind or PostCSS in their app.
 
 | Function | Description |
 |----------|-------------|
-| `loadCatalog(config, { cwd })` | Parse all adapters in memory; returns `{ catalog, defaultSchemaId }` |
+| `loadCatalog(config, { cwd })` | Parse all adapters in memory; merge unified groups; returns `{ catalog, defaultSchemaId }` |
 | `generate(config, { cwd, configPath })` | Write per-schema JSON + `catalog.json` to `config.output` |
 | `watchCatalog(options)` | File watch on config + schema paths; debounced regenerate |
+| `mergeUnifiedSchema(input)` | Pure strict merge of parsed member sources |
+| `UnifiedSchemaValidationError` | Aggregated diagnostics with stable codes |
 
 CLI commands `generate` and `watch` call these directly.
 
 ## Config types
 
 ```ts
-defineProject({ output?: string, schemas: OzzyRMSchemaSource[] })
+defineProject({
+  output?: string,
+  schemas: OzzyRMSchemaSource[],
+  unified?: UnifiedSchemaDefinition[],
+})
 prisma({ id, include, version?, file?, disabled?, metadata? })
 drizzle({ id, include, version?, file?, disabled?, metadata? })
+sql({ id, include, version?, file?, disabled?, metadata? })
+
+// unified group — member source ids must exist in schemas
+{ id, sources: string[], file?, version?, label? }
 ```
 
 Each `OzzyRMSchemaSource` extends `OrmDocgenAdapter` with `id`, optional `label`, `file` (sidebar label), and `version` (semver display).
