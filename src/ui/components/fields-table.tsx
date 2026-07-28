@@ -16,7 +16,7 @@ interface FieldsTableProps {
 
 function formatDefault(field: DocField): string {
     if (!field.default) {
-        return "—";
+        return "-";
     }
 
     if (field.default.kind === "function") {
@@ -81,16 +81,16 @@ export function FieldsTable({
             <table className="min-w-full text-[13px]">
                 <thead>
                     <tr className="border-b border-border bg-code-bg/50">
-                        <th className="px-3 py-2 text-left text-[11px] font-medium uppercase tracking-wide text-muted">
+                        <th className="px-3 py-2 text-left text-[11px] font-medium uppercase text-muted">
                             Field
                         </th>
-                        <th className="px-3 py-2 text-left text-[11px] font-medium uppercase tracking-wide text-muted">
+                        <th className="px-3 py-2 text-left text-[11px] font-medium uppercase text-muted">
                             Type
                         </th>
-                        <th className="px-3 py-2 text-left text-[11px] font-medium uppercase tracking-wide text-muted">
+                        <th className="px-3 py-2 text-left text-[11px] font-medium uppercase text-muted">
                             Attributes
                         </th>
-                        <th className="px-3 py-2 text-left text-[11px] font-medium uppercase tracking-wide text-muted">
+                        <th className="px-3 py-2 text-left text-[11px] font-medium uppercase text-muted">
                             Default
                         </th>
                     </tr>
@@ -112,7 +112,7 @@ export function FieldsTable({
                                 key={field.name}
                                 id={rowId}
                                 data-nav-target
-                                className="border-b border-border align-top transition-colors last:border-b-0 hover:bg-code-bg/30 data-[highlight=true]:bg-accent/10"
+                                className="border-b border-border align-top transition-colors last:border-b-0 hover:bg-code-bg/30 data-[highlight=true]:bg-black/10"
                             >
                                 <td className="px-3 py-2">
                                     <div>
@@ -132,14 +132,14 @@ export function FieldsTable({
                                                     onClick={() => onNavigate(
                                                         fieldSectionId(field.relation!.model, field.relation!.field)
                                                     )}
-                                                    className="inline-flex items-center gap-1 font-mono text-[11px] text-muted transition-colors hover:text-accent"
+                                                    className="bg-code-bg px-2 py-0.5 rounded-sm inline-flex items-center gap-1 font-mono text-[10px] text-muted transition-colors hover:text-black"
                                                 >
-                                                    <ArrowRight className="h-3 w-3 shrink-0" strokeWidth={2} />
+                                                    <ArrowRight className="h-3 w-3 shrink-0" />
                                                     <span>{field.relation.model}.{field.relation.field}</span>
                                                 </button>
                                                 <Badge
                                                     label={field.relation.type}
-                                                    variant="constraint"
+                                                    variant="nobg"
                                                     glossaryCategory="attribute"
                                                     onGlossaryClick={openGlossary}
                                                 />
@@ -184,13 +184,12 @@ export function FieldsTable({
                                                 <Badge
                                                     key={item}
                                                     label={item}
-                                                    variant="constraint"
                                                     glossaryCategory="attribute"
                                                     onGlossaryClick={openGlossary}
                                                 />
                                             ))
                                         ) : (
-                                            <span className="text-muted">—</span>
+                                            <span className="text-muted">-</span>
                                         )}
                                     </div>
                                 </td>

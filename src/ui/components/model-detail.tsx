@@ -2,6 +2,7 @@ import type { DocModel } from "../..";
 import { sectionId } from "../lib/section-id";
 import { FieldsTable } from "./fields-table";
 import { ReferenceLink } from "./reference-link";
+import { Badge } from "./ui/badge";
 
 interface ModelDetailProps {
     model: DocModel;
@@ -11,34 +12,34 @@ interface ModelDetailProps {
 }
 
 export function ModelDetail({ model, modelNames, enumNames, onNavigate }: ModelDetailProps) {
+    const tableName = model.dbName ?? model.tableName;
+
     return (
         <section
             id={sectionId("model", model.name)}
             data-section
             className="scroll-mt-6 border-b border-border py-10 last:border-b-0"
         >
-            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <h2 className="font-mono text-lg font-semibold tracking-tight">{model.name}</h2>
-                {model.dbName && (
-                    <span className="font-mono text-[11px] text-muted">table: {model.dbName}</span>
-                )}
-                {model.source && (
-                    <span className="font-mono text-[11px] text-muted">
-                        from: {model.source.id} ({model.source.orm})
-                    </span>
-                )}
+            <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-lg font-semibold capitalize">{model.name}</h2>
+                {tableName ? <Badge label={`table: ${tableName}`} /> : null}
+                {model.source ? (
+                    <Badge label={`from: ${model.source.id} (${model.source.orm})`} />
+                ) : null}
             </div>
 
             {model.description && (
                 <p className="mt-2 max-w-2xl text-[13px] text-muted">{model.description}</p>
             )}
 
-            <div className="mt-3 flex flex-wrap gap-2 text-[12px] text-muted">
-                <span>{model.fields.length} fields</span>
-                {model.indexes.length > 0 && <span>· {model.indexes.length} indexes</span>}
-                {model.referencedBy.length > 0 && (
-                    <span>· referenced by {model.referencedBy.length}</span>
-                )}
+            <div className="mt-3 flex flex-wrap gap-1.5">
+                <span className="text-muted text-xs underline ">{model.fields.length} fields</span>
+                {model.indexes.length > 0 ? (
+                    <Badge label={`${model.indexes.length} indexes`} />
+                ) : null}
+                {model.referencedBy.length > 0 ? (
+                    <span className="text-muted text-xs underline ">referenced by {model.referencedBy.length}</span>
+                ) : null}
             </div>
 
             {model.referencedBy.length > 0 && (
@@ -73,7 +74,6 @@ export function ModelDetail({ model, modelNames, enumNames, onNavigate }: ModelD
             )}
 
             <div className="mt-6">
-                <h3 className="mb-3 text-[12px] font-medium text-muted">Fields</h3>
                 <FieldsTable
                     fields={model.fields}
                     modelName={model.name}
