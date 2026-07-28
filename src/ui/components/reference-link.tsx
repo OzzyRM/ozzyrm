@@ -12,10 +12,11 @@ export function ReferenceLink({ model, field, onNavigate }: ReferenceLinkProps) 
         <button
             type="button"
             onClick={() => onNavigate(fieldSectionId(model, field))}
-            className="inline-flex items-center gap-1 rounded border border-border bg-code-bg/40 px-2 py-0.5 font-mono text-[11px] text-muted transition-colors hover:border-accent/30 hover:text-accent"
+            className="bg-code-bg px-2 py-0.5 rounded-sm inline-flex items-center gap-1 font-mono text-[10px] text-muted transition-colors hover:text-black"
         >
             <ArrowRight className="h-3 w-3 shrink-0" strokeWidth={2} />
-            <span>{model}.{field}</span>
+            <span className="font-semibold">{model}</span>
+            <span className="font-mono">{field}</span>
         </button>
     );
 }
