@@ -91,7 +91,7 @@ export function Sheet({ open, onClose, title, children }: SheetProps) {
                         <p className="text-[11px] font-medium uppercase tracking-wider text-muted">
                             Reference
                         </p>
-                        <h2 className="mt-1 font-mono text-lg font-semibold tracking-tight">{title}</h2>
+                        <h2 className="mt-1 text-lg font-semibold tracking-tight">{title}</h2>
                     </div>
                     <button
                         type="button"

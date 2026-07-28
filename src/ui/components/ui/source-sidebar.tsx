@@ -120,7 +120,7 @@ export function SourceSidebar({
 
             <nav className={`flex-1 overflow-y-auto py-3 ${collapsed ? "px-1.5" : "px-2"}`}>
                 {!collapsed && (
-                    <p className="mb-2 px-2 text-[11px] font-medium uppercase tracking-wider text-muted">
+                    <p className="mb-2 px-2 text-[11px] font-medium uppercase text-muted">
                         Schemas
                     </p>
                 )}
@@ -143,11 +143,11 @@ export function SourceSidebar({
                                     onClick={() => onSchemaChange(activeVersion.id)}
                                     className={`flex h-9 w-full items-center justify-center rounded-md transition-colors ${
                                         groupActive
-                                            ? "bg-accent/10 text-foreground"
-                                            : "text-muted hover:bg-background/60 hover:text-foreground"
+                                            ? "bg-gray-100 font-medium text-black"
+                                            : "text-muted hover:bg-gray-100/70 hover:text-foreground"
                                     }`}
                                 >
-                                    <span className="font-mono text-[12px] font-semibold">
+                                    <span className="text-[12px] font-semibold">
                                         {fileInitial(group.file)}
                                     </span>
                                 </button>
@@ -159,17 +159,17 @@ export function SourceSidebar({
                                 <button
                                     type="button"
                                     onClick={() => toggleGroup(group.id)}
-                                    className={`relative w-full truncate py-1 pl-2 text-left font-mono text-[13px] transition-colors ${
+                                    className={`w-full truncate border-l-2 py-1.5 pl-2 text-left text-[13px] transition-colors ${
                                         groupActive
-                                            ? "font-medium text-foreground"
-                                            : "text-muted hover:text-foreground"
+                                            ? "border-transparent font-medium text-black"
+                                            : "border-transparent text-muted hover:bg-gray-100/70 hover:text-foreground"
                                     }`}
                                 >
                                     {group.file}
                                 </button>
 
                                 {expanded && (
-                                    <div className="space-y-0.5">
+                                    <div className="space-y-0.5 pl-3">
                                         {group.versions.map((version) => {
                                             const active = version.id === activeSchemaId;
 
@@ -178,11 +178,12 @@ export function SourceSidebar({
                                                     key={version.id}
                                                     type="button"
                                                     onClick={() => onSchemaChange(version.id)}
-                                                    className={`relative w-full truncate py-1 pl-5 text-left font-mono text-[13px] transition-colors ${
+                                                    className={[
+                                                        "w-full truncate border-l-2 py-1.5 pl-2 text-left text-[13px] transition-colors",
                                                         active
-                                                            ? "font-medium text-foreground before:absolute before:left-0 before:top-1/2 before:h-3.5 before:w-0.5 before:-translate-y-1/2 before:rounded-full before:bg-accent"
-                                                            : "text-muted hover:text-foreground"
-                                                    }`}
+                                                            ? "border-black bg-gray-100 font-medium text-black"
+                                                            : "border-transparent text-muted hover:bg-gray-100/70 hover:text-foreground",
+                                                    ].join(" ")}
                                                 >
                                                     {version.version}
                                                 </button>
@@ -201,7 +202,7 @@ export function SourceSidebar({
                     type="button"
                     onClick={() => setCollapsed((value) => !value)}
                     title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-                    className={`flex items-center rounded-md text-muted transition-colors hover:bg-background/60 hover:text-foreground ${
+                    className={`flex items-center rounded-md text-muted transition-colors hover:bg-gray-100/70 hover:text-foreground ${
                         collapsed
                             ? "mx-auto h-9 w-9 justify-center"
                             : "h-8 w-full gap-2 px-2"
@@ -223,7 +224,7 @@ export function SourceSidebar({
                     type="button"
                     aria-label="Resize sidebar"
                     onMouseDown={onResizeStart}
-                    className="absolute -right-1 top-0 z-10 h-full w-2 cursor-col-resize hover:bg-accent/20"
+                    className="absolute -right-1 top-0 z-10 h-full w-2 cursor-col-resize hover:bg-gray-100"
                 />
             )}
         </aside>

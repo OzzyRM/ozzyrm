@@ -1,13 +1,12 @@
 "use client";
 
 import type { DocSchema } from "../../..";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { searchSchema } from "../../lib/search-schema";
 import { sectionId } from "../../lib/section-id";
 import { resolveSidebarActiveId } from "../../lib/scroll-spy";
 import { useDebouncedValue } from "../../lib/use-debounced-value";
-import { X } from "lucide-react";
 
 export interface NavSection {
     id: string;
@@ -52,25 +51,26 @@ function NavLink({
     }, [active]);
 
     return (
-        <button
-            ref={ref}
-            type="button"
-            onClick={onClick}
-            className={`relative w-full truncate py-1 text-left text-[13px] transition-colors ${
-                nested ? "pl-5" : "pl-2"
-            } ${
-                active
-                    ? "font-medium text-foreground before:absolute before:left-0 before:top-1/2 before:h-3.5 before:w-0.5 before:-translate-y-1/2 before:rounded-full before:bg-accent"
-                    : "text-muted hover:text-foreground"
-            }`}
-        >
-            <span className="font-mono">{label}</span>
-            {suffix && (
-                <span className="ml-1.5 text-[10px] uppercase tracking-wide text-muted/70">
-                    {suffix}
-                </span>
-            )}
-        </button>
+        <div className={nested ? "pl-3" : undefined}>
+            <button
+                ref={ref}
+                type="button"
+                onClick={onClick}
+                className={[
+                    "w-full truncate py-1.5 pl-2 text-left text-sm rounded-md transition-colors",
+                    active
+                        ? "border-black bg-gray-100 text-black"
+                        : "border-transparent text-muted hover:bg-gray-100/70 hover:text-foreground",
+                ].join(" ")}
+            >
+                <span className="capitalize">{label}</span>
+                {suffix ? (
+                    <span className="ml-1.5 text-[10px] capitalize text-muted/70">
+                        {suffix}
+                    </span>
+                ) : null}
+            </button>
+        </div>
     );
 }
 
@@ -124,7 +124,7 @@ export function Sidebar({ schema, activeId, onNavigate }: SidebarProps) {
     const isSearching = debouncedQuery.trim().length > 0;
 
     return (
-        <aside className="flex w-[240px] shrink-0 flex-col border-r border-border bg-background">
+        <aside className="flex w-60 shrink-0 flex-col border-r border-border bg-background">
             <div className="px-3 py-3">
                 <div className="relative">
                     <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted" />
@@ -132,7 +132,7 @@ export function Sidebar({ schema, activeId, onNavigate }: SidebarProps) {
                         value={query}
                         onChange={(event) => setQuery(event.target.value)}
                         placeholder="Search models, fields..."
-                        className="w-full rounded-md border border-border bg-background py-1.5 pl-8 pr-3 text-[13px] text-foreground outline-none transition-colors placeholder:text-muted focus:border-accent/40 [&::-webkit-search-cancel-button]:cursor-pointer"
+                        className="w-full rounded-md border border-border bg-background py-1.5 pl-8 pr-3 text-[13px] text-foreground outline-none transition-colors placeholder:text-muted focus:border-black/20 [&::-webkit-search-cancel-button]:cursor-pointer"
                     />
                     {query && (
                         <button
@@ -152,7 +152,7 @@ export function Sidebar({ schema, activeId, onNavigate }: SidebarProps) {
                     searchGroups.length > 0 ? (
                         searchGroups.map((group) => (
                             <div key={group.title} className="mb-4 last:mb-0">
-                                <p className="mb-1.5 px-2 text-[11px] font-medium uppercase tracking-wider text-muted">
+                                <p className="mb-1.5 px-2 text-[11px] font-medium uppercase text-muted">
                                     {group.title}
                                 </p>
                                 <div className="space-y-0.5">
@@ -177,7 +177,7 @@ export function Sidebar({ schema, activeId, onNavigate }: SidebarProps) {
                 ) : (
                     groups.map((group) => (
                         <div key={group.title} className="mb-4 last:mb-0">
-                            <p className="mb-1.5 px-2 text-[11px] font-medium uppercase tracking-wider text-muted">
+                            <p className="mb-1.5 px-2 text-md font-semibold text-muted">
                                 {group.title}
                             </p>
                             <div className="space-y-0.5">
