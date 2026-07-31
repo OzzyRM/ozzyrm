@@ -18,13 +18,13 @@ export function ModelDetail({ model, modelNames, enumNames, onNavigate }: ModelD
         <section
             id={sectionId("model", model.name)}
             data-section
-            className="scroll-mt-6 border-b border-border py-10 last:border-b-0"
+            className="scroll-mt-6 py-10"
         >
             <div className="flex flex-wrap items-center gap-2">
                 <h2 className="text-lg font-semibold capitalize">{model.name}</h2>
                 {tableName ? <Badge label={`table: ${tableName}`} /> : null}
                 {model.source ? (
-                    <Badge label={`from: ${model.source.id} (${model.source.orm})`} />
+                    <Badge label={`from: ${model.source.id}`} orm={model.source.orm} />
                 ) : null}
             </div>
 

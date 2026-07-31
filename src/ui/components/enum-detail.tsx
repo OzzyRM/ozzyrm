@@ -17,7 +17,7 @@ export function EnumDetail({ enumDef }: EnumDetailProps) {
                 <h2 className="text-lg font-semibold ">{enumDef.name}</h2>
                 {enumDef.dbName ? <Badge label={`db: ${enumDef.dbName}`} /> : null}
                 {enumDef.source ? (
-                    <Badge label={`from: ${enumDef.source.id} (${enumDef.source.orm})`} />
+                    <Badge label={`from: ${enumDef.source.id}`} orm={enumDef.source.orm} />
                 ) : null}
                 <Badge label={`${enumDef.values.length} values`} />
             </div>
