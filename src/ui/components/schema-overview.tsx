@@ -15,10 +15,10 @@ export function SchemaOverview({ schema }: SchemaOverviewProps) {
         <section
             id={sectionId("overview")}
             data-section
-            className="scroll-mt-6 border-b border-border pb-10"
+            className="scroll-mt-6 pt-10 pb-10"
         >
             <div className="flex flex-wrap items-center gap-1.5">
-                <Badge label={schema.orm} />
+                <Badge orm={schema.orm} label={schema.orm === "unified" ? "unified" : undefined} />
                 <Badge label={schema.version} />
                 <Badge label={`${schema.models.length} models`} />
                 <Badge label={`${schema.enums.length} enums`} />
@@ -52,7 +52,8 @@ export function SchemaOverview({ schema }: SchemaOverviewProps) {
                     {mergedFrom.map((source) => (
                         <Badge
                             key={source.id}
-                            label={`${source.id} (${source.orm})`}
+                            label={source.id}
+                            orm={source.orm}
                         />
                     ))}
                 </div>
