@@ -63,7 +63,7 @@ function NavLink({
                         : "border-transparent text-muted hover:bg-gray-100/70 hover:text-foreground",
                 ].join(" ")}
             >
-                <span className="capitalize">{label}</span>
+                <span className="">{label}</span>
                 {suffix ? (
                     <span className="ml-1.5 text-[10px] capitalize text-muted/70">
                         {suffix}
@@ -129,21 +129,12 @@ export function Sidebar({ schema, activeId, onNavigate }: SidebarProps) {
                 <div className="relative">
                     <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted" />
                     <input
+                        type="search"
                         value={query}
                         onChange={(event) => setQuery(event.target.value)}
                         placeholder="Search models, fields..."
                         className="w-full rounded-md border border-border bg-background py-1.5 pl-8 pr-3 text-[13px] text-foreground outline-none transition-colors placeholder:text-muted focus:border-black/20 [&::-webkit-search-cancel-button]:cursor-pointer"
                     />
-                    {query && (
-                        <button
-                            type="button"
-                            onClick={() => setQuery("")}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted transition-colors hover:text-foreground"
-                            aria-label="Clear search"
-                        >
-                            <X className="h-3.5 w-3.5" />
-                        </button>
-                    )}
                 </div>
             </div>
 
