@@ -41,6 +41,7 @@
     "prepublishOnly": "bun run build"
   },
   "dependencies": {
+    "@boxicons/react": "^1.0.3",
     "@prisma/dmmf": "^7.0.0",
     "@prisma/internals": "^7.0.0",
     "lucide-react": "^1.26.0",
