@@ -81,10 +81,10 @@ OzzyRM assumes a **trusted development or deployment host**. The library documen
 
 ### Boundary E — Static serve
 
-**Location:** `src/cli/serve.ts`.
+**Location:** `src/cli/serve.ts` + `src/security/paths.ts` → `resolveStaticFile`.
 
 - Serves files from a root directory for local preview.
-- Must confine pathname to root; historically a path-traversal risk if `../` is accepted.
+- Pathnames are confined: `..` segments, encoded traversal, and escapes outside root → `403 Forbidden`.
 
 ### Boundary F — Hot stamp import
 

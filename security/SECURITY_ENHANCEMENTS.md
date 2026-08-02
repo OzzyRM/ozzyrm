@@ -162,13 +162,13 @@ Not recommended. Prefer never fetching remote config.
 
 | ID | Title | Priority | Status |
 |----|-------|----------|--------|
-| SE-01 | Serve path confinement | P0 | Planned |
-| SE-02 | Datasource redaction tests | P0 | Planned |
+| SE-01 | Serve path confinement | P0 | Done |
+| SE-02 | Datasource redaction tests | P0 | Done |
 | SE-03 | Hostile string UI fixtures | P0 | Planned |
-| SE-04 | `restrictPathsToCwd` | P1 | Planned |
-| SE-05 | Stamp validate / non-JS stamp | P1 | Planned |
+| SE-04 | `restrictPathsToCwd` | P1 | Done (default true) |
+| SE-05 | Stamp validate / non-JS stamp | P1 | Done (allowlist before import) |
 | SE-06 | Resource limits | P1 | Planned |
-| SE-07 | logoSrc scheme allowlist | P1 | Planned |
+| SE-07 | logoSrc scheme allowlist | P1 | Done |
 | SE-08 | Security CI forbidlist + audit | P1 | Planned |
 | SE-09 | Host CSP docs | P2 | Planned |
 | SE-10 | Style nonce support | P2 | Planned |

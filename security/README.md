@@ -39,12 +39,13 @@ OzzyRM is a **local / trusted-host** schema documentation toolkit. It is not a m
 | Area | Posture |
 |------|---------|
 | Config execution | **High trust** — `import(ozzyrm.config.ts)` runs arbitrary JS/TS module code |
-| Schema file read | **Process FS permissions** — `include`/`output` resolve under cwd; `..` / absolute paths allowed |
+| Schema file read | **`security.restrictPathsToCwd` default true** — `include`/`output` must stay under cwd (override documented) |
 | Unified / scenarios | **Fail-closed** — `UnifiedSchemaValidationError` with stable diagnostic codes |
 | Docs UI XSS | **Generally sound** — React text escaping; no `dangerouslySetInnerHTML` in library UI |
-| Prisma datasource URL | **Not persisted** into `DocSchema` (provider-oriented; avoid leaking connection strings) |
-| `ozzyrm serve` | **Needs hardening** — path traversal risk if pathname is not confined to root |
-| Watch / hot stamp | **Dev convenience** — `stamp.js` dynamic import for Next HMR bridge |
+| Prisma datasource URL | **Stripped** via `sanitizeDataSource` / `sanitizeDocSchema` before catalog write/UI |
+| `ozzyrm serve` | **Path-confined** — `resolveStaticFile` rejects `..` / escapes (`403`) |
+| Watch / hot stamp | **Allowlisted** — `stamp.js` contents validated before dynamic import |
+| `logoSrc` | **Scheme-filtered** — blocks `javascript:` / non-image `data:` |
 
 ## Quick principles
 
