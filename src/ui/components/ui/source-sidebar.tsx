@@ -4,6 +4,7 @@ import { CircleHelp, File } from "lucide-react";
 import { useCallback, useState } from "react";
 import type { SchemaCatalogGroup } from "../../types";
 import { DEFAULT_LOGO_SRC } from "../../brand/default-logo";
+import { sanitizeLogoSrc } from "../../../security/logo-src";
 import { useGlossary } from "../glossary-provider";
 import { SchemaSearchDialog } from "./schema-search-dialog";
 
@@ -25,6 +26,7 @@ export function SourceSidebar({
     const { openDocsSearch } = useGlossary();
     const [schemaSearchOpen, setSchemaSearchOpen] = useState(false);
     const [schemaQuery, setSchemaQuery] = useState("");
+    const safeLogoSrc = sanitizeLogoSrc(logoSrc, DEFAULT_LOGO_SRC);
 
     const openSchemaSearch = useCallback((seed = "") => {
         setSchemaQuery(seed);
@@ -43,7 +45,7 @@ export function SourceSidebar({
             >
                 <div className="flex items-center justify-center border-b border-border px-2 py-3">
                     <img
-                        src={logoSrc}
+                        src={safeLogoSrc}
                         alt="OzzyRM"
                         width={28}
                         height={28}
