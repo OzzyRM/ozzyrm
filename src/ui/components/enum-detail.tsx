@@ -11,7 +11,7 @@ export function EnumDetail({ enumDef }: EnumDetailProps) {
         <section
             id={sectionId("enum", enumDef.name)}
             data-section
-            className="scroll-mt-6 border-b border-border py-10 last:border-b-0"
+            className="scroll-mt-6 py-10"
         >
             <div className="flex flex-wrap items-center gap-2">
                 <h2 className="text-lg font-semibold ">{enumDef.name}</h2>

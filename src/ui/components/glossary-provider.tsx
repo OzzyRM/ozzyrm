@@ -7,6 +7,7 @@ import { DocsSearchDialog } from "./ui/docs-search-dialog";
 
 interface GlossaryContextValue {
     openGlossary: (label: string, category: GlossaryCategory) => void;
+    openDocsSearch: (initialQuery?: string) => void;
 }
 
 const GlossaryContext = createContext<GlossaryContextValue | null>(null);
@@ -15,19 +16,26 @@ export function GlossaryProvider({ children }: { children: ReactNode }) {
     const [open, setOpen] = useState(false);
     const [initialQuery, setInitialQuery] = useState("");
 
+    const openDocsSearch = useCallback((query = "") => {
+        setInitialQuery(query);
+        setOpen(true);
+    }, []);
+
     const openGlossary = useCallback((label: string, category: GlossaryCategory) => {
         const match = lookupGlossary(label, category);
         if (match) {
-            setInitialQuery(match.label);
-            setOpen(true);
+            openDocsSearch(match.label);
         }
-    }, []);
+    }, [openDocsSearch]);
 
     const close = useCallback(() => {
         setOpen(false);
     }, []);
 
-    const value = useMemo(() => ({ openGlossary }), [openGlossary]);
+    const value = useMemo(
+        () => ({ openGlossary, openDocsSearch }),
+        [openGlossary, openDocsSearch]
+    );
 
     return (
         <GlossaryContext.Provider value={value}>

@@ -9,6 +9,7 @@ import { highlightElement, scrollContainerToTarget } from "../lib/scroll-to-targ
 import { EnumDetail } from "./enum-detail";
 import { GlossaryProvider } from "./glossary-provider";
 import { ModelDetail } from "./model-detail";
+import { ScenarioDetail } from "./scenario-detail";
 import { SchemaOverview } from "./schema-overview";
 import { Sidebar } from "./ui/sidebar";
 import { SourceSidebar } from "./ui/source-sidebar";
@@ -36,6 +37,7 @@ export function SchemaDocs({
 
     const activeSelection = findSchemaById(catalog, activeSchemaId);
     const schema = activeSelection?.version.schema;
+    const scenarios = activeSelection?.version.scenarios;
 
     const handleSchemaChange = useCallback((id: string) => {
         setActiveSchemaId(id);
@@ -53,7 +55,11 @@ export function SchemaDocs({
         isScrollingRef.current = true;
         setActiveId(id);
 
-        scrollContainerToTarget(container, target);
+        const isFieldOrValue =
+            id.startsWith("field-") || id.includes("-value-");
+        scrollContainerToTarget(container, target, {
+            align: isFieldOrValue ? "center" : undefined,
+        });
         highlightElement(target);
 
         window.setTimeout(() => {
@@ -125,27 +131,39 @@ export function SchemaDocs({
 
                 <Sidebar
                     schema={schema}
+                    scenarios={scenarios}
                     activeId={activeId}
                     onNavigate={scrollToSection}
                 />
 
                 <main ref={mainRef} className="flex-1 overflow-y-auto bg-background">
-                    <div className="mx-auto max-w-3xl px-8 py-6 pb-24">
-                        <SchemaOverview schema={schema} />
+                    <div className="px-8 py-6 pb-[45vh]">
+                        <SchemaOverview schema={schema} onNavigate={scrollToSection} />
 
-                        {schema.models.map((model: (typeof schema.models)[number]) => (
-                            <ModelDetail
-                                key={model.name}
-                                model={model}
-                                modelNames={modelNames}
-                                enumNames={enumNames}
+                        {(scenarios ?? []).map((scenario) => (
+                            <ScenarioDetail
+                                key={scenario.id}
+                                scenario={scenario}
+                                schema={schema}
                                 onNavigate={scrollToSection}
                             />
                         ))}
 
-                        {schema.enums.map((enumDef: (typeof schema.enums)[number]) => (
-                            <EnumDetail key={enumDef.name} enumDef={enumDef} />
-                        ))}
+                        <div className="mx-auto max-w-3xl">
+                            {schema.models.map((model: (typeof schema.models)[number]) => (
+                                <ModelDetail
+                                    key={model.name}
+                                    model={model}
+                                    modelNames={modelNames}
+                                    enumNames={enumNames}
+                                    onNavigate={scrollToSection}
+                                />
+                            ))}
+
+                            {schema.enums.map((enumDef: (typeof schema.enums)[number]) => (
+                                <EnumDetail key={enumDef.name} enumDef={enumDef} />
+                            ))}
+                        </div>
                     </div>
                 </main>
             </div>
