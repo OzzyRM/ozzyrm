@@ -1,6 +1,7 @@
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
-import { extname, join, resolve } from "node:path";
+import { extname, resolve } from "node:path";
+import { resolveStaticFile } from "../security/paths";
 
 const MIME: Record<string, string> = {
     ".html": "text/html; charset=utf-8",
@@ -20,7 +21,7 @@ export interface ServeOptions {
 
 /**
  * Thin static server for `ozzyrm serve`.
- * Serves a prebuilt UI bundle; rendering stays in ozzyrm/ui.
+ * Serves a prebuilt UI bundle; paths are confined to `root` (no traversal).
  */
 export async function serve(options: ServeOptions): Promise<{ close: () => Promise<void> }> {
     const root = resolve(options.root);
@@ -36,7 +37,17 @@ export async function serve(options: ServeOptions): Promise<{ close: () => Promi
                 pathname = pathname.slice(route.length) || "/";
             }
 
-            const filePath = join(root, pathname === "/" ? "index.html" : pathname);
+            const filePath = resolveStaticFile(
+                root,
+                pathname === "/" ? "/index.html" : pathname
+            );
+
+            if (!filePath) {
+                res.writeHead(403, { "Content-Type": "text/plain; charset=utf-8" });
+                res.end("Forbidden");
+                return;
+            }
+
             const content = await readFile(filePath);
             res.writeHead(200, {
                 "Content-Type": MIME[extname(filePath)] ?? "application/octet-stream",
@@ -69,3 +80,5 @@ function normalizeRoute(route: string): string {
 
     return route.endsWith("/") && route.length > 1 ? route.slice(0, -1) : route;
 }
+
+export { resolveStaticFile } from "../security/paths";
