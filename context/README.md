@@ -12,6 +12,8 @@ This folder contains structured context for AI agents working on the OzzyRM code
 | [FEATURES.md](./FEATURES.md) | Current shipped capabilities |
 | [FUTURE_IMPROVEMENTS.md](./FUTURE_IMPROVEMENTS.md) | Known gaps, planned work, and design direction |
 
+Security (threat model, guidelines, OSS limits, reporting): see [`../security/`](../security/README.md).
+
 ## Quick facts
 
 - **Package name:** `ozzyrm` (single npm package, version 0.3.0)
