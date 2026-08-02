@@ -24,7 +24,8 @@ export type DiagnosticCode =
     | "UNKNOWN_MODEL"
     | "UNKNOWN_ENUM"
     | "PATH_MODEL_NOT_IN_SCENARIO"
-    | "PATH_RELATION_MISSING";
+    | "PATH_RELATION_MISSING"
+    | "PATH_OUTSIDE_PROJECT";
 
 export interface UnifiedDiagnostic {
     code: DiagnosticCode;

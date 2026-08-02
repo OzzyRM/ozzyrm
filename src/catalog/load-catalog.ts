@@ -15,6 +15,8 @@ import {
 } from "./validation";
 import { resolveScenarios } from "./resolve-scenarios";
 import type { DocSchema, DocScenario } from "../utils/types/types";
+import { resolveProjectPath } from "../security/paths";
+import { sanitizeDocSchema } from "../security/sanitize-datasource";
 
 export const DEFAULT_SCHEMA_VERSION = "1.0.0";
 
@@ -89,6 +91,7 @@ export function normalizeProjectConfig(
             unified: config.unified,
             scenarios: config.scenarios,
             watch: config.watch,
+            security: config.security,
         };
     }
 
@@ -132,7 +135,7 @@ async function parseSource(
         const parser = await loadParser(source.orm);
         const include = source.include.map((path) => resolve(cwd, path));
         const schema = await parser.parse({ ...source, include });
-        const processed = postProcess(schema, source);
+        const processed = sanitizeDocSchema(postProcess(schema, source));
 
         return {
             id: source.id,
@@ -268,6 +271,44 @@ function validateProjectIds(project: OzzyRMProjectConfig): UnifiedDiagnostic[] {
     return diagnostics;
 }
 
+function restrictPathsToCwd(project: OzzyRMProjectConfig): boolean {
+    return project.security?.restrictPathsToCwd !== false;
+}
+
+function validateProjectPaths(
+    project: OzzyRMProjectConfig,
+    cwd: string
+): UnifiedDiagnostic[] {
+    if (!restrictPathsToCwd(project)) {
+        return [];
+    }
+
+    const diagnostics: UnifiedDiagnostic[] = [];
+    const output = project.output ?? "./.ozzyrm";
+    if (resolveProjectPath(cwd, output) == null) {
+        diagnostics.push({
+            code: "PATH_OUTSIDE_PROJECT",
+            message: `output path "${output}" must stay under project cwd (set security.restrictPathsToCwd: false to override)`,
+            path: ["output"],
+        });
+    }
+
+    for (const [index, source] of project.schemas.entries()) {
+        for (const [includeIndex, includePath] of (source.include ?? []).entries()) {
+            if (resolveProjectPath(cwd, includePath) == null) {
+                diagnostics.push({
+                    code: "PATH_OUTSIDE_PROJECT",
+                    message: `schemas[${index}].include[${includeIndex}] "${includePath}" must stay under project cwd (set security.restrictPathsToCwd: false to override)`,
+                    sourceId: source.id,
+                    path: ["schemas", source.id || String(index), "include", includePath],
+                });
+            }
+        }
+    }
+
+    return diagnostics;
+}
+
 function buildUnifiedEntries(
     project: OzzyRMProjectConfig,
     parsed: ParsedSourceEntry[]
@@ -292,10 +333,12 @@ function buildUnifiedEntries(
         }
 
         try {
-            const schema = mergeUnifiedSchema({
-                definition,
-                members: parsed,
-            });
+            const schema = sanitizeDocSchema(
+                mergeUnifiedSchema({
+                    definition,
+                    members: parsed,
+                })
+            );
             const file = definition.file ?? definition.id;
 
             entries.push({
@@ -341,6 +384,11 @@ export async function loadCatalog(
     const idDiagnostics = validateProjectIds(project);
     if (idDiagnostics.length > 0) {
         throw new UnifiedSchemaValidationError(idDiagnostics);
+    }
+
+    const pathDiagnostics = validateProjectPaths(project, cwd);
+    if (pathDiagnostics.length > 0) {
+        throw new UnifiedSchemaValidationError(pathDiagnostics);
     }
 
     const settled = await Promise.allSettled(
