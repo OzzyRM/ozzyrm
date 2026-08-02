@@ -3,6 +3,9 @@ export type DiagnosticCode =
     | "DUP_GROUP_ID"
     | "UNKNOWN_SOURCE"
     | "EMPTY_GROUP"
+    | "EMPTY_SCHEMAS"
+    | "INVALID_SOURCE_ID"
+    | "EMPTY_INCLUDE"
     | "SOURCE_PARSE_FAILED"
     | "DUP_MODEL"
     | "DUP_TABLE_NAME"
@@ -12,7 +15,16 @@ export type DiagnosticCode =
     | "REL_TARGET_NOT_FOUND"
     | "REL_FIELD_NOT_FOUND"
     | "ENUM_NOT_FOUND"
-    | "INDEX_FIELD_NOT_FOUND";
+    | "INDEX_FIELD_NOT_FOUND"
+    | "DUP_SCENARIO_ID"
+    | "INVALID_SCENARIO_ID"
+    | "INVALID_SCENARIO_LABEL"
+    | "UNKNOWN_SCHEMA_ID"
+    | "EMPTY_SCENARIO_MODELS"
+    | "UNKNOWN_MODEL"
+    | "UNKNOWN_ENUM"
+    | "PATH_MODEL_NOT_IN_SCENARIO"
+    | "PATH_RELATION_MISSING";
 
 export interface UnifiedDiagnostic {
     code: DiagnosticCode;
@@ -37,7 +49,7 @@ export class UnifiedSchemaValidationError extends Error {
 
 export function formatDiagnostics(diagnostics: UnifiedDiagnostic[]): string {
     if (diagnostics.length === 0) {
-        return "unified schema validation failed";
+        return "ozzyrm validation failed";
     }
 
     const lines = diagnostics.map((item, index) => {
@@ -46,7 +58,7 @@ export function formatDiagnostics(diagnostics: UnifiedDiagnostic[]): string {
         return `${index + 1}. ${item.code}${source}${location}: ${item.message}`;
     });
 
-    return `unified schema validation failed with ${diagnostics.length} issue(s):\n${lines.join("\n")}`;
+    return `ozzyrm validation failed with ${diagnostics.length} issue(s):\n${lines.join("\n")}`;
 }
 
 export function normalizeIdentityKey(value: string): string {

@@ -12,8 +12,18 @@ export {
     schemaGroupId,
     DEFAULT_SCHEMA_VERSION,
 } from "./load-catalog";
+export {
+    resolveScenarios,
+    collectRelatedModelPairs,
+} from "./resolve-scenarios";
 export { generate, type GenerateResult } from "./generate";
-export { watchCatalog, type WatchOptions } from "./watch";
+export {
+    watchCatalog,
+    resolveWatchConfig,
+    collectWatchPaths,
+    type WatchOptions,
+    type ResolvedWatchConfig,
+} from "./watch";
 export {
     mergeUnifiedSchema,
     type MergeUnifiedInput,

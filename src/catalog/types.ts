@@ -1,9 +1,10 @@
-import type { DocSchema } from "../utils/types/types";
+import type { DocSchema, DocScenario } from "../utils/types/types";
 
 export interface SchemaCatalogVersion {
     id: string;
     version: string;
     schema: DocSchema;
+    scenarios?: DocScenario[];
 }
 
 export interface SchemaCatalogGroup {

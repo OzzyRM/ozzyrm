@@ -1,6 +1,10 @@
 import { watch } from "fs";
 import { resolve } from "path";
-import type { OrmDocgenAdapter, OzzyRMProjectConfig } from "../utils/adapter";
+import type {
+    OrmDocgenAdapter,
+    OzzyRMProjectConfig,
+    OzzyRMWatchConfig,
+} from "../utils/adapter";
 import { generate } from "./generate";
 import { loadConfigFile, normalizeProjectConfig } from "./load-catalog";
 
@@ -10,13 +14,58 @@ export interface WatchOptions {
     config?: OzzyRMProjectConfig | OrmDocgenAdapter;
     onGenerate?: (files: string[]) => void;
     onError?: (error: unknown) => void;
+    /** override config.watch.debounceMs */
+    debounceMs?: number;
 }
 
-async function getWatchedPaths(
+export interface ResolvedWatchConfig {
+    enabled: boolean;
+    debounceMs: number;
+    generateOnStart: boolean;
+    hot: boolean;
+}
+
+const DEFAULT_DEBOUNCE_MS = 200;
+
+/** Normalize `watch: true | false | { ... }` from project config. */
+export function resolveWatchConfig(
+    watch?: boolean | OzzyRMWatchConfig
+): ResolvedWatchConfig {
+    if (watch === false) {
+        return {
+            enabled: false,
+            debounceMs: DEFAULT_DEBOUNCE_MS,
+            generateOnStart: true,
+            hot: false,
+        };
+    }
+
+    if (watch === true || watch == null) {
+        return {
+            enabled: true,
+            debounceMs: DEFAULT_DEBOUNCE_MS,
+            generateOnStart: true,
+            hot: false,
+        };
+    }
+
+    return {
+        enabled: watch.enabled !== false,
+        debounceMs:
+            typeof watch.debounceMs === "number" && watch.debounceMs >= 0
+                ? watch.debounceMs
+                : DEFAULT_DEBOUNCE_MS,
+        generateOnStart: watch.generateOnStart !== false,
+        hot: watch.hot === true,
+    };
+}
+
+export async function collectWatchPaths(
     project: OzzyRMProjectConfig,
-    cwd: string
+    cwd: string,
+    configPath = "ozzyrm.config.ts"
 ): Promise<string[]> {
-    const paths: string[] = [resolve(cwd, "ozzyrm.config.ts")];
+    const paths: string[] = [resolve(cwd, configPath)];
 
     for (const source of project.schemas) {
         const resolved = source.include.map((path) => resolve(cwd, path));
@@ -46,19 +95,38 @@ async function getWatchedPaths(
 }
 
 /** Watch schema/config files and regenerate .ozzyrm JSON output. */
-export async function watchCatalog(options: WatchOptions = {}): Promise<{ close: () => void }> {
+export async function watchCatalog(
+    options: WatchOptions = {}
+): Promise<{ close: () => void }> {
     const cwd = options.cwd ?? process.cwd();
+    const configPath = options.configPath ?? "ozzyrm.config.ts";
     const project = options.config
         ? normalizeProjectConfig(options.config)
-        : await loadConfigFile(cwd, options.configPath ?? "ozzyrm.config.ts");
+        : await loadConfigFile(cwd, configPath);
 
-    const paths = await getWatchedPaths(project, cwd);
+    const watchConfig = resolveWatchConfig(project.watch);
+    const debounceMs = options.debounceMs ?? watchConfig.debounceMs;
+
+    if (!watchConfig.enabled) {
+        console.log(
+            "[ozzyrm] watch.enabled=false in config — nothing to watch. Set watch: true or watch: { enabled: true }."
+        );
+        return { close() {} };
+    }
+
+    const paths = await collectWatchPaths(project, cwd, configPath);
     let timer: ReturnType<typeof setTimeout> | undefined;
 
     const run = async (label: string) => {
         try {
-            const result = await generate(project, { cwd });
-            console.log(`[ozzyrm] ${label} → ${result.files.length} file(s) in ${result.outputDir}`);
+            // reload config each run so ozzyrm.config.ts edits apply
+            const latest = options.config
+                ? normalizeProjectConfig(options.config)
+                : await loadConfigFile(cwd, configPath);
+            const result = await generate(latest, { cwd });
+            console.log(
+                `[ozzyrm] ${label} → ${result.files.length} file(s) in ${result.outputDir}`
+            );
             options.onGenerate?.(result.files);
         } catch (error) {
             // keep previous valid JSON on disk; report full diagnostics for unified failures
@@ -74,7 +142,7 @@ export async function watchCatalog(options: WatchOptions = {}): Promise<{ close:
         clearTimeout(timer);
         timer = setTimeout(() => {
             void run(label);
-        }, 200);
+        }, debounceMs);
     };
 
     const watchers = paths.map((path) => {
@@ -82,7 +150,15 @@ export async function watchCatalog(options: WatchOptions = {}): Promise<{ close:
         return watch(path, () => schedule(path));
     });
 
-    await run("initial");
+    if (watchConfig.hot) {
+        console.log(
+            "[ozzyrm] watch.hot=true — writing stamp.js on generate for Next/bundler HMR"
+        );
+    }
+
+    if (watchConfig.generateOnStart) {
+        await run("initial");
+    }
 
     return {
         close() {

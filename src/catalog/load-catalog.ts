@@ -13,6 +13,8 @@ import {
     UnifiedDiagnostic,
     UnifiedSchemaValidationError,
 } from "./validation";
+import { resolveScenarios } from "./resolve-scenarios";
+import type { DocSchema, DocScenario } from "../utils/types/types";
 
 export const DEFAULT_SCHEMA_VERSION = "1.0.0";
 
@@ -85,6 +87,8 @@ export function normalizeProjectConfig(
             output: config.output ?? "./.ozzyrm",
             schemas: config.schemas,
             unified: config.unified,
+            scenarios: config.scenarios,
+            watch: config.watch,
         };
     }
 
@@ -155,7 +159,10 @@ async function parseSource(
     }
 }
 
-function toCatalog(entries: GeneratedEntry[]): LoadedCatalog {
+function toCatalog(
+    entries: GeneratedEntry[],
+    scenariosBySchemaId?: Map<string, DocScenario[]>
+): LoadedCatalog {
     const groupsMap = new Map<string, GeneratedEntry[]>();
 
     for (const entry of entries) {
@@ -178,6 +185,7 @@ function toCatalog(entries: GeneratedEntry[]): LoadedCatalog {
                 id: entry.id,
                 version: entry.version,
                 schema: entry.schema,
+                scenarios: scenariosBySchemaId?.get(entry.id),
             })),
         };
     });
@@ -191,28 +199,70 @@ function toCatalog(entries: GeneratedEntry[]): LoadedCatalog {
 function validateProjectIds(project: OzzyRMProjectConfig): UnifiedDiagnostic[] {
     const diagnostics: UnifiedDiagnostic[] = [];
     const sourceIds = new Set<string>();
+    /** kebab-case ids: app-prisma, company-schema */
+    const idRe = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 
-    for (const source of project.schemas) {
-        if (sourceIds.has(source.id)) {
+    if (!project.schemas.length) {
+        diagnostics.push({
+            code: "EMPTY_SCHEMAS",
+            message: "project config requires at least one schema source in schemas[]",
+            path: ["schemas"],
+        });
+        return diagnostics;
+    }
+
+    for (const [index, source] of project.schemas.entries()) {
+        const id = typeof source.id === "string" ? source.id.trim() : "";
+        if (!id || !idRe.test(id)) {
+            diagnostics.push({
+                code: "INVALID_SOURCE_ID",
+                message: id
+                    ? `schema source id "${id}" must be kebab-case (e.g. app-prisma)`
+                    : `schemas[${index}].id is required and must be kebab-case (e.g. app-prisma)`,
+                sourceId: id || undefined,
+                path: ["schemas", String(index), "id"],
+            });
+        } else if (sourceIds.has(id)) {
             diagnostics.push({
                 code: "DUP_SOURCE_ID",
-                message: `duplicate schema source id "${source.id}"`,
-                sourceId: source.id,
+                message: `duplicate schema source id "${id}"`,
+                sourceId: id,
+            });
+        } else {
+            sourceIds.add(id);
+        }
+
+        if (!Array.isArray(source.include) || source.include.length === 0) {
+            diagnostics.push({
+                code: "EMPTY_INCLUDE",
+                message: `schema source "${id || `schemas[${index}]`}" requires a non-empty include[]`,
+                sourceId: id || undefined,
+                path: ["schemas", id || String(index), "include"],
             });
         }
-        sourceIds.add(source.id);
     }
 
     const groupIds = new Set<string>();
-    for (const group of project.unified ?? []) {
-        if (groupIds.has(group.id)) {
+    for (const [index, group] of (project.unified ?? []).entries()) {
+        const id = typeof group.id === "string" ? group.id.trim() : "";
+        if (!id || !idRe.test(id)) {
+            diagnostics.push({
+                code: "INVALID_SOURCE_ID",
+                message: id
+                    ? `unified group id "${id}" must be kebab-case (e.g. company-schema)`
+                    : `unified[${index}].id is required and must be kebab-case (e.g. company-schema)`,
+                sourceId: id || undefined,
+                path: ["unified", String(index), "id"],
+            });
+        } else if (groupIds.has(id)) {
             diagnostics.push({
                 code: "DUP_GROUP_ID",
-                message: `duplicate unified group id "${group.id}"`,
-                sourceId: group.id,
+                message: `duplicate unified group id "${id}"`,
+                sourceId: id,
             });
+        } else {
+            groupIds.add(id);
         }
-        groupIds.add(group.id);
     }
 
     return diagnostics;
@@ -355,5 +405,11 @@ export async function loadCatalog(
         }));
 
     const ordered = [...unifiedEntries, ...standaloneEntries];
-    return toCatalog(ordered);
+
+    const schemasById = new Map<string, DocSchema>(
+        ordered.map((entry) => [entry.id, entry.schema])
+    );
+    const scenariosBySchemaId = resolveScenarios(project.scenarios, schemasById);
+
+    return toCatalog(ordered, scenariosBySchemaId);
 }
