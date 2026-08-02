@@ -12,7 +12,10 @@ export async function downloadErdPng(
             if (!(node instanceof HTMLElement)) {
                 return true;
             }
-            return !node.classList.contains("erd-toolbar");
+            return (
+                !node.classList.contains("erd-toolbar") &&
+                !node.classList.contains("erd-canvas__test")
+            );
         },
     });
 

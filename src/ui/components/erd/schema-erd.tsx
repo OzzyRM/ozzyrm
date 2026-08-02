@@ -2,6 +2,7 @@
 
 import {
     Background,
+    ControlButton,
     Controls,
     MiniMap,
     ReactFlow,
@@ -13,7 +14,15 @@ import {
     type NodeTypes,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { Download, Maximize2, Play, RotateCcw, Square } from "lucide-react";
+import {
+    Download,
+    Expand,
+    Maximize2,
+    Minimize2,
+    Play,
+    RotateCcw,
+    Square,
+} from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { DocSchema } from "../../..";
 import {
@@ -215,6 +224,7 @@ function SchemaErdCanvas({
     const [nodes, setNodes, onNodesChange] = useNodesState<ErdModelNode>([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
     const [downloading, setDownloading] = useState(false);
+    const [fullscreen, setFullscreen] = useState(false);
     const wrapperRef = useRef<HTMLDivElement>(null);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const { fitView, setViewport } = useReactFlow();
@@ -225,14 +235,19 @@ function SchemaErdCanvas({
     const scheduleView = useCallback(() => {
         if (timerRef.current) clearTimeout(timerRef.current);
         timerRef.current = setTimeout(() => {
-            if (isLarge) {
-                setViewport({ x: 10, y: 10, zoom: LARGE_ZOOM });
+            if (fullscreen || !isLarge) {
+                fitView({
+                    padding: fullscreen ? 0.08 : 0.15,
+                    duration: fullscreen ? 200 : 0,
+                    minZoom: 0.04,
+                    maxZoom: 1.5,
+                });
             } else {
-                fitView({ padding: 0.15, duration: 0, minZoom: 0.1, maxZoom: 1.5 });
+                setViewport({ x: 10, y: 10, zoom: LARGE_ZOOM });
             }
             timerRef.current = null;
         }, 100);
-    }, [fitView, setViewport, isLarge]);
+    }, [fitView, setViewport, isLarge, fullscreen]);
 
     const applyLayout = useCallback(() => {
         const next = buildLaidOutGraph(schema, onNavigate, modelFilter);
@@ -261,6 +276,44 @@ function SchemaErdCanvas({
         fitView({ padding: 0.08, duration: 200, minZoom: 0.04, maxZoom: 1.5 });
     }, [fitView]);
 
+    const exitFullscreen = useCallback(() => {
+        setFullscreen(false);
+    }, []);
+
+    const enterFullscreen = useCallback(() => {
+        setFullscreen(true);
+    }, []);
+
+    useEffect(() => {
+        if (!fullscreen) {
+            return;
+        }
+
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+                event.preventDefault();
+                exitFullscreen();
+            }
+        };
+
+        window.addEventListener("keydown", onKeyDown);
+        scheduleView();
+
+        return () => {
+            document.body.style.overflow = previousOverflow;
+            window.removeEventListener("keydown", onKeyDown);
+        };
+    }, [fullscreen, exitFullscreen, scheduleView]);
+
+    useEffect(() => {
+        if (!fullscreen) {
+            scheduleView();
+        }
+    }, [fullscreen, scheduleView]);
+
     const onDownload = useCallback(async () => {
         const viewport = wrapperRef.current?.querySelector(
             ".react-flow__viewport"
@@ -274,10 +327,18 @@ function SchemaErdCanvas({
         }
     }, [schema.orm]);
 
-    const height = canvasHeight(modelCount);
+    const height = fullscreen ? undefined : canvasHeight(modelCount);
 
     return (
-        <div className="erd-shell mt-6" ref={wrapperRef}>
+        <div
+            className={[
+                "erd-shell mt-6",
+                fullscreen ? "erd-shell--fullscreen" : undefined,
+            ]
+                .filter(Boolean)
+                .join(" ")}
+            ref={wrapperRef}
+        >
             <div className="erd-toolbar">
                 <span className="erd-toolbar__title">{title}</span>
                 <div className="erd-toolbar__actions">
@@ -312,23 +373,33 @@ function SchemaErdCanvas({
                 </div>
             </div>
 
-            <div className="erd-canvas" style={{ height }}>
+            <div className="erd-canvas" style={height ? { height } : undefined}>
                 {testAction ? (
-                    <div className="erd-canvas__overlay">
-                        <button
-                            type="button"
-                            className="erd-toolbar__btn"
-                            onClick={testAction.onToggle}
-                            title={testAction.playing ? "Stop path test" : "Test path"}
-                        >
-                            {testAction.playing ? (
-                                <Square aria-hidden className="erd-toolbar__icon" />
-                            ) : (
-                                <Play aria-hidden className="erd-toolbar__icon" />
-                            )}
-                            <span>{testAction.playing ? "Stop" : "Test"}</span>
-                        </button>
-                    </div>
+                    <button
+                        type="button"
+                        className="erd-toolbar__btn erd-canvas__test"
+                        onClick={testAction.onToggle}
+                        title={
+                            testAction.playing
+                                ? "Stop path test"
+                                : "Test path"
+                        }
+                    >
+                        {testAction.playing ? (
+                            <Square
+                                aria-hidden
+                                className="erd-toolbar__icon"
+                            />
+                        ) : (
+                            <Play
+                                aria-hidden
+                                className="erd-toolbar__icon"
+                            />
+                        )}
+                        <span>
+                            {testAction.playing ? "Stop" : "Test"}
+                        </span>
+                    </button>
                 ) : null}
                 <ReactFlow
                     nodes={nodes}
@@ -348,7 +419,29 @@ function SchemaErdCanvas({
                     defaultEdgeOptions={{ type: "default" }}
                 >
                     <Background gap={20} size={1} color="var(--border)" />
-                    <Controls showInteractive={false} />
+                    <Controls showInteractive={false} showFitView={false}>
+                        <ControlButton
+                            onClick={
+                                fullscreen ? exitFullscreen : enterFullscreen
+                            }
+                            title={
+                                fullscreen
+                                    ? "Exit fullscreen (Esc)"
+                                    : "Open fullscreen"
+                            }
+                            aria-label={
+                                fullscreen
+                                    ? "Exit fullscreen"
+                                    : "Open fullscreen"
+                            }
+                        >
+                            {fullscreen ? (
+                                <Minimize2 aria-hidden />
+                            ) : (
+                                <Expand aria-hidden />
+                            )}
+                        </ControlButton>
+                    </Controls>
                     <MiniMap
                         pannable
                         zoomable
