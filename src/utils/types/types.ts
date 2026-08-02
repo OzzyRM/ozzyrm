@@ -138,3 +138,15 @@ export interface DocSchema {
     /** member sources when orm === "unified" */
     sources?: SchemaSourceRef[];
 };
+
+/** Resolved scenario after validating config refs against a DocSchema */
+export interface DocScenario {
+    id: string;
+    label: string;
+    description?: string;
+    models: string[];
+    enums: string[];
+    path: string[];
+    /** adjacent path pairs that have a relation in either direction */
+    pathEdges: Array<{ source: string; target: string }>;
+}
