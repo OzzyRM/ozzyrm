@@ -73,6 +73,29 @@
   overflow: hidden;
 }
 
+.erd-shell--fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  margin: 0 !important;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
+  border: none;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: none;
+  background: var(--background);
+}
+
+.erd-shell--fullscreen .erd-canvas {
+  flex: 1 1 auto;
+  height: auto !important;
+  min-height: 0;
+}
+
 .erd-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -82,6 +105,7 @@
   padding: 0.5rem 0.75rem;
   border-bottom: 1px solid var(--border);
   background: var(--sidebar);
+  flex-shrink: 0;
 }
 
 .erd-toolbar__title {
@@ -207,7 +231,7 @@
   height: 320px;
 }
 
-.erd-canvas__overlay {
+.erd-canvas__test {
   position: absolute;
   top: 0.75rem;
   left: 0.75rem;
