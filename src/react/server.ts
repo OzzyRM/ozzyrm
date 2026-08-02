@@ -1,4 +1,4 @@
-import { access } from "fs/promises";
+import { access, readFile } from "fs/promises";
 import { join, resolve } from "path";
 import { pathToFileURL } from "url";
 import { createElement } from "react";
@@ -6,6 +6,7 @@ import type { OzzyRMProjectConfig } from "../utils/adapter";
 import { loadCatalog } from "../catalog/load-catalog";
 import { resolveWatchConfig } from "../catalog/watch";
 import { UnifiedSchemaValidationError } from "../catalog/validation";
+import { isSafeOzzyrmStampModule } from "../security/stamp";
 import { ConfigErrorOverlay } from "./config-error-overlay";
 import { OzzyRMDocs, type OzzyRMDocsProps } from "./OzzyRMDocs";
 
@@ -18,6 +19,7 @@ export type OzzyRMDocsFromConfigProps = Omit<OzzyRMDocsProps, "catalog" | "defau
 /**
  * Import `.ozzyrm/stamp.js` when watch.hot is on so Next/Turbopack
  * invalidate this module when `ozzyrm watch` regenerates after schema edits.
+ * File contents are validated before import (allowlisted stamp module only).
  */
 async function pullHotStamp(config: OzzyRMProjectConfig, cwd: string): Promise<void> {
     const watchConfig = resolveWatchConfig(config.watch);
@@ -28,8 +30,14 @@ async function pullHotStamp(config: OzzyRMProjectConfig, cwd: string): Promise<v
     const stampPath = join(resolve(cwd, config.output ?? "./.ozzyrm"), "stamp.js");
     try {
         await access(stampPath);
+        const source = await readFile(stampPath, "utf-8");
+        if (!isSafeOzzyrmStampModule(source)) {
+            console.warn(
+                "[ozzyrm] refusing to import stamp.js — contents are not a safe ozzyrm stamp module"
+            );
+            return;
+        }
         const mod = await import(/* webpackIgnore: true */ pathToFileURL(stampPath).href);
-        // keep stamp in the module graph
         void mod?.ozzyrmStamp;
     } catch {
         // stamp missing until first `ozzyrm watch` / generate with hot — ok
