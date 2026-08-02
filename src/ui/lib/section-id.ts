@@ -5,7 +5,10 @@ function slug(value: string): string {
         .replace(/^-|-$/g, "");
 }
 
-export function sectionId(kind: "overview" | "model" | "enum", name?: string): string {
+export function sectionId(
+    kind: "overview" | "model" | "enum" | "scenario",
+    name?: string
+): string {
     if (kind === "overview") {
         return "overview";
     }
