@@ -72,6 +72,15 @@ export interface OzzyRMWatchConfig {
     hot?: boolean;
 }
 
+export interface OzzyRMSecurityConfig {
+    /**
+     * Keep `include` and `output` paths under the project cwd.
+     * Default true (open-source safe). Set false only for trusted monorepo layouts
+     * that intentionally read schemas outside cwd.
+     */
+    restrictPathsToCwd?: boolean;
+}
+
 export interface OzzyRMProjectConfig {
     output?: string;
     schemas: OzzyRMSchemaSource[];
@@ -84,6 +93,8 @@ export interface OzzyRMProjectConfig {
      * Not required for production `loadCatalog`.
      */
     watch?: boolean | OzzyRMWatchConfig;
+    /** Optional filesystem / output hardening knobs */
+    security?: OzzyRMSecurityConfig;
 }
 
 export function defineConfig(config: OrmDocgenAdapter): OrmDocgenAdapter {

@@ -131,8 +131,8 @@ export interface DocSchema {
     orm: SupportedORMs;
     // ORM versioning helping drafted ORMs / unified graph version label
     version: string;
-    // **! FOR OUTPUT IS REDACTED !**
-    dataSource?: { provider: ProviderEnums; url?: string };
+    // provider only — connection URLs must never be persisted (see sanitizeDataSource)
+    dataSource?: { provider: ProviderEnums };
     models: DocModel[];
     enums: DocEnum[];
     /** member sources when orm === "unified" */
