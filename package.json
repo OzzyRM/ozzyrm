@@ -42,8 +42,11 @@
   },
   "dependencies": {
     "@boxicons/react": "^1.0.3",
+    "@dagrejs/dagre": "^3.0.0",
     "@prisma/dmmf": "^7.0.0",
     "@prisma/internals": "^7.0.0",
+    "@xyflow/react": "^12.11.2",
+    "html-to-image": "^1.11.13",
     "lucide-react": "^1.26.0",
     "typescript": "^5.4.0"
   },
@@ -54,6 +57,7 @@
   "devDependencies": {
     "@tailwindcss/cli": "^4.3.3",
     "@types/bun": "latest",
+    "@types/dagre": "^0.7.54",
     "@types/node": "^26.1.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
