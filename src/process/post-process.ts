@@ -1,5 +1,6 @@
 import type { DocSchema } from "../utils/types/types";
 import type { OrmDocgenAdapter } from "../utils/adapter";
+import { sanitizeDocSchema } from "../security/sanitize-datasource";
 
 export function postProcess(schema: DocSchema, adapter: OrmDocgenAdapter): DocSchema {
     /**
@@ -17,7 +18,7 @@ export function postProcess(schema: DocSchema, adapter: OrmDocgenAdapter): DocSc
         schema = applyMetadata(schema, adapter);
     }
 
-    return schema;
+    return sanitizeDocSchema(schema);
 }
 
 /**
