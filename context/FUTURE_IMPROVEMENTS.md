@@ -32,12 +32,15 @@ The gitignored `scripts/` folder in the monorepo is for internal dev only; do no
 
 ### HMR story for Next.js
 
-Current watch regenerates `.ozzyrm/*.json` but Next.js HMR for in-memory `loadCatalog` requires either:
+**Not automatic for `.prisma` / `.sql` alone** — those files are outside the Next module graph.
 
-- Re-import on file change (custom dev script), or
-- Reading `.ozzyrm/catalog.json` with a file watcher in dev
+Recommended consumer loops:
 
-Clarify and document the recommended dev loop for schema edits.
+1. **Simple:** `loadCatalog(config)` + `export const dynamic = "force-dynamic"` → refresh browser after schema edits
+2. **Hot:** `watch: { hot: true }` in config, run `ozzyrm watch` next to `next dev` → generate writes `.ozzyrm/stamp.js`, `OzzyRMDocsFromConfig` imports it so the bundler reloads
+3. **Config-only HMR:** editing `ozzyrm.config.ts` already invalidates via normal Next HMR
+
+`watch.enabled` / `debounceMs` / `generateOnStart` only affect the CLI watcher.
 
 ### Test coverage
 

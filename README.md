@@ -69,7 +69,8 @@ Rules:
 - **Explicit only** — sources not listed in any `unified` group stay standalone
 - **Strict conflicts** — duplicate model/table/enum identities always fail (no silent merge)
 - **Cross-source relations** — a SQL FK to `users` can resolve to Prisma `User @@map("users")` when that identity has a single owner
-- **Fail closed** — `loadCatalog()` / `generate` reject with aggregated diagnostics; `watch` logs them and keeps the previous valid JSON
+- **Fail closed** — `loadCatalog()` / `generate` reject with aggregated diagnostics (including invalid `scenarios` config); `watch` logs them and keeps the previous valid JSON
+- **Error overlay** — `ConfigErrorOverlay` / `OzzyRMDocsFromConfig` show a Next.js-style popup with a copyable message when validation fails
 
 Example conflict (two sources both own `users`):
 
@@ -81,33 +82,43 @@ unified: [{ id: "broken", sources: ["app-prisma", "legacy-sql"] }]
 ## Next.js (App Router)
 
 ```tsx
-import { loadCatalog } from "ozzyrm";
-import { OzzyRMDocs } from "ozzyrm/react";
-import config from "../ozzyrm.config";
-
-export default async function Page() {
-  const { catalog, defaultSchemaId } = await loadCatalog(config);
-  return <OzzyRMDocs catalog={catalog} defaultSchemaId={defaultSchemaId} />;
-}
-```
-
-Or:
-
-```tsx
 import config from "../ozzyrm.config";
 import { OzzyRMDocsFromConfig } from "ozzyrm/react/server";
+
+export const dynamic = "force-dynamic"; // pick up schema edits on refresh
 
 export default async function Page() {
   return <OzzyRMDocsFromConfig config={config} />;
 }
 ```
 
-## CLI
+### Watch / HMR after publish (not automatic alone)
+
+Editing `.prisma` / `.sql` is **outside** Next’s module graph, so browser HMR is **not** automatic unless you opt in:
+
+| Mode | Setup | Behavior |
+|------|--------|----------|
+| Refresh | `loadCatalog(config)` + `dynamic = "force-dynamic"` | F5 reloads catalog |
+| Config edits | import `ozzyrm.config.ts` | Next HMR when config changes |
+| Schema file HMR | `watch: { hot: true }` + run `ozzyrm watch` beside `next dev` | watch writes `.ozzyrm/stamp.js` → bundler invalidates → docs re-render |
+
+```ts
+export default defineProject({
+  schemas: [/* ... */],
+  watch: {
+    enabled: true,     // ozzyrm watch respects this (default true)
+    debounceMs: 200,
+    hot: true,         // stamp.js bridge for Next
+  },
+});
+```
 
 ```bash
-npx ozzyrm generate   # write ./.ozzyrm/*.json
-npx ozzyrm watch      # regenerate on schema change
+npx ozzyrm watch   # terminal 1
+next dev           # terminal 2
 ```
+
+`watch: false` disables the CLI watcher. Production `loadCatalog` ignores watch options.
 
 ## Develop
 

@@ -159,7 +159,9 @@ Consumers do not need Tailwind or PostCSS in their app.
 |----------|-------------|
 | `loadCatalog(config, { cwd })` | Parse all adapters in memory; merge unified groups; returns `{ catalog, defaultSchemaId }` |
 | `generate(config, { cwd, configPath })` | Write per-schema JSON + `catalog.json` to `config.output` |
-| `watchCatalog(options)` | File watch on config + schema paths; debounced regenerate |
+| `watchCatalog(options)` | File watch on config + schema paths; respects `config.watch` (`enabled`, `debounceMs`, `generateOnStart`, `hot`) |
+| `resolveWatchConfig(watch)` | Normalize `watch: boolean | object` to defaults |
+
 | `mergeUnifiedSchema(input)` | Pure strict merge of parsed member sources |
 | `UnifiedSchemaValidationError` | Aggregated diagnostics with stable codes |
 
@@ -172,6 +174,8 @@ defineProject({
   output?: string,
   schemas: OzzyRMSchemaSource[],
   unified?: UnifiedSchemaDefinition[],
+  scenarios?: SchemaScenarioDefinition[],
+  watch?: boolean | OzzyRMWatchConfig,
 })
 prisma({ id, include, version?, file?, disabled?, metadata? })
 drizzle({ id, include, version?, file?, disabled?, metadata? })
@@ -179,6 +183,17 @@ sql({ id, include, version?, file?, disabled?, metadata? })
 
 // unified group — member source ids must exist in schemas
 { id, sources: string[], file?, version?, label? }
+
+// scenario — use-case slice attached to a catalog version by schemaId
+{
+  id, label, description?,
+  schemaId,           // SchemaCatalogVersion.id
+  models: string[],
+  enums?: string[],
+  path?: string[],    // ordered models for ERD path highlight
+}
 ```
 
 Each `OzzyRMSchemaSource` extends `OrmDocgenAdapter` with `id`, optional `label`, `file` (sidebar label), and `version` (semver display).
+
+`loadCatalog` resolves scenarios against the matching `DocSchema`, derives `pathEdges` from adjacent path pairs that have a relation, and attaches `DocScenario[]` onto `SchemaCatalogVersion.scenarios`. Validation is **fail-closed**: invalid kebab-case ids, duplicate ids, unknown `schemaId` / model / enum, path models not listed in `models`, or missing relations between path hops throw `UnifiedSchemaValidationError` with stable diagnostic codes (`INVALID_SCENARIO_ID`, `UNKNOWN_MODEL`, `PATH_RELATION_MISSING`, …). `OzzyRMDocsFromConfig` catches that error and renders `ConfigErrorOverlay` (copyable popup).

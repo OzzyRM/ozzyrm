@@ -8,6 +8,10 @@
 - `sql()` adapter: raw `.sql` files or directories (CREATE TABLE / ENUM / INDEX / FK)
 - Per-source options: `id`, `version`, `file` label, `disabled` flags, `metadata` descriptions
 - Optional `unified: [{ id, sources, file?, version? }]` — merge selected sources into one graph
+- Optional `scenarios: [{ id, label, schemaId, models, enums?, path? }]` — use-case slices for docs UI + ERD path highlight
+- Scenario config is **fail-closed**: bad ids, unknown schema/model/enum refs, path models missing from `models`, or path hops without a relation throw `UnifiedSchemaValidationError`
+- `ConfigErrorOverlay` (from `ozzyrm/react`) — Next.js-style popup with copyable error message; used by playground and `OzzyRMDocsFromConfig`
+- Optional `watch: true | false | { enabled?, debounceMs?, generateOnStart?, hot? }` — controls `ozzyrm watch`; `hot: true` writes `.ozzyrm/stamp.js` for Next/bundler HMR when watch runs alongside the app
 - Default output directory: `./.ozzyrm`
 
 ## Parsing
@@ -23,7 +27,8 @@
 
 - `loadCatalog(config)` — runtime parse without writing files; rejects on unified validation errors
 - `generate(config)` — JSON per schema + `catalog.json` manifest (writes nothing on unified failure)
-- `watchCatalog()` — debounced file watching; logs unified diagnostics and keeps previous valid JSON
+- `watchCatalog()` — debounced file watching; reads `config.watch`; logs unified diagnostics and keeps previous valid JSON
+- `resolveWatchConfig()` / `collectWatchPaths()` — normalize watch flags and list watched schema paths
 - Unified entries replace consumed member sources in the sidebar
 - Version grouping in sidebar (multiple versions per schema file)
 - `mergeUnifiedSchema` / `UnifiedSchemaValidationError` for pure merge + structured diagnostics
@@ -47,6 +52,8 @@
 - Collapsible source sidebar (schema file tree with versions)
 - Main nav sidebar with scroll spy
 - Schema overview section (unified graphs show "Merged from" source list)
+- Auto-generated ERD on overview (React Flow + dagre layout)
+- **Scenarios**: config-defined use-case slices (`models` / `enums` / optional `path`) in a sidebar Scenario group; filtered ERD + path highlight Test controls
 - Model detail: fields table, relations, indexes (source attribution when unified)
 - Enum detail with values (source attribution when unified)
 - Bottom navigation on mobile/narrow layouts
