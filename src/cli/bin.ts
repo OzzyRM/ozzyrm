@@ -36,6 +36,7 @@ async function main() {
 Usage:
   ozzyrm generate [--config ozzyrm.config.ts]
   ozzyrm watch    [--config ozzyrm.config.ts]
+                  # respects config.watch: enabled, debounceMs, generateOnStart, hot
   ozzyrm serve    --root <dir> [--port 4173] [--route /docs]
 
 Typical flow:
