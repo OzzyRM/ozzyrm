@@ -4,3 +4,4 @@ export * from "./utils/adapter";
 export * from "./process";
 export * from "./parsers";
 export * from "./catalog";
+export * from "./security";
