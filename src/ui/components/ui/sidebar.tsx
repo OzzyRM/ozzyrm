@@ -197,26 +197,29 @@ export function Sidebar({ schema, scenarios, activeId, onNavigate }: SidebarProp
                 ) : null}
             </div>
 
-            <nav className="flex-1 overflow-y-auto px-2 py-3">
+            <nav className="flex min-h-0 flex-1 flex-col overflow-y-auto px-2 py-3">
                 {isSearching && !hasResult ? (
-                    <div className="py-10 text-center text-xs text-muted">
-                        <p>
-                            "<span className="font-medium">{debouncedQuery}</span>" not found
+                    <div className="flex flex-1 items-center justify-center px-3 py-10">
+                        <p className="w-full max-w-full break-all text-center text-xs leading-relaxed text-muted">
+                            <span className="font-medium text-foreground/80">
+                                &ldquo;{debouncedQuery}&rdquo;
+                            </span>
+                            <span> not found</span>
                         </p>
                     </div>
-                ): (
+                ) : (
                     displayGroups.map((group) => {
                         const branched = groupUsesBranch(
                             group.title,
                             (group as NavGroup).branched
                         );
-            
+
                         return (
                             <div key={group.title} className="mb-4 last:mb-0">
                                 <p className="mb-1 px-2 text-[10px] font-medium uppercase tracking-wider text-muted">
                                     {group.title}
                                 </p>
-            
+
                                 <div className={branched ? "nav-branch" : "space-y-0.5"}>
                                     {group.items.map((item, index) => {
                                         const searchItem = item as SearchItem | NavSection;
@@ -227,7 +230,7 @@ export function Sidebar({ schema, scenarios, activeId, onNavigate }: SidebarProp
                                                 ? searchItem.type
                                                 : undefined;
                                         const indent = branched ? 1 + depth : 0;
-            
+
                                         return (
                                             <NavLink
                                                 key={item.id}
