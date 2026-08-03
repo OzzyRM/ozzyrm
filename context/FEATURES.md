@@ -80,7 +80,7 @@
 
 ## npm package surface
 
-Single package `ozzyrm@0.3.0` with subpath exports:
+Single package `ozzyrm@0.3.1` with subpath exports:
 
 - `.` — core API
 - `./react` — client components

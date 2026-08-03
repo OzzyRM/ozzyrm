@@ -1,6 +1,6 @@
 # Open Source Readiness — OzzyRM
 
-Specification for keeping the **main package** secure, reliable, and contributor-friendly before shipping (e.g. `0.4.0`).
+Specification for keeping the **main package** secure, reliable, and contributor-friendly before shipping (e.g. `0.3.1`).
 
 This is the project checklist. Security threat details live under [`security/`](./security/).
 
@@ -72,7 +72,7 @@ Full rules: [`security/OPEN_SOURCE_SECURITY.md`](./security/OPEN_SOURCE_SECURITY
 - Consumers should pin `ozzyrm` in their lockfile
 - Review `bun audit` before each release ([`security/CHECKLIST.md`](./security/CHECKLIST.md) §B)
 
-## 6. Pre-release checklist (e.g. before `0.4.0`)
+## 6. Pre-release checklist (e.g. before `0.3.x`)
 
 - [ ] All §2 artifacts present and linked from README
 - [ ] CI green on `main`

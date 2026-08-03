@@ -16,7 +16,7 @@ Security (threat model, guidelines, OSS limits, reporting): see [`../security/`]
 
 ## Quick facts
 
-- **Package name:** `ozzyrm` (single npm package, version 0.3.0)
+- **Package name:** `ozzyrm` (single npm package, version 0.3.1)
 - **Purpose:** Schema documentation UI for Prisma, Drizzle, and raw SQL (mixed stacks)
 - **Runtime:** Bun for development; published output is CommonJS + bundled CSS
 - **Consumer install:** `bun add ozzyrm` or `npm i ozzyrm`
