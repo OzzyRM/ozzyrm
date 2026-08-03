@@ -1,20 +1,19 @@
-# dependencies (bun install)
+# dependencies
 node_modules
 
-# output
+# build output
 out
 dist
 *.tgz
+
+# generated catalog (local)
 .ozzyrm
 
-# local playgrounds / consumer sandboxes (not published source)
+# internal playground / fixtures (maintainer-only, not in public repo)
 /web
 /test
-/scripts
 /fixtures
 ozzyrm.config.ts
-
-# local parser fixtures (kept on disk for generate, not in repo)
 
 # code coverage
 coverage
@@ -22,10 +21,10 @@ coverage
 
 # logs
 logs
-_.log
-report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
+*.log
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
-# dotenv environment variable files
+# env
 .env
 .env.development.local
 .env.test.local
@@ -37,8 +36,10 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .cache
 *.tsbuildinfo
 
-# IntelliJ based IDEs
+# editors / os
 .idea
-
-# Finder (MacOS) folder config
 .DS_Store
+.cursor
+
+# graph / agent local artifacts
+graphify-out
