@@ -13,6 +13,8 @@ export interface OzzyRMDocsProps {
     basePath?: string;
     defaultSchemaId?: string;
     logoSrc?: string;
+    /** Glossary docs origin. Default https://ozzyrm.vercel.app */
+    docsBaseUrl?: string;
     className?: string;
 }
 
@@ -29,6 +31,7 @@ export function OzzyRMDocs({
     basePath = "/",
     defaultSchemaId,
     logoSrc,
+    docsBaseUrl,
     className,
 }: OzzyRMDocsProps) {
     const hostRef = useRef<HTMLDivElement>(null);
@@ -49,6 +52,7 @@ export function OzzyRMDocs({
             basePath,
             defaultSchemaId,
             logoSrc,
+            docsBaseUrl,
         };
 
         handleRef.current = mount(host, options);
@@ -58,7 +62,7 @@ export function OzzyRMDocs({
             handleRef.current = null;
             host.replaceChildren();
         };
-    }, [catalog, basePath, defaultSchemaId, logoSrc]);
+    }, [catalog, basePath, defaultSchemaId, logoSrc, docsBaseUrl]);
 
     return (
         <div
