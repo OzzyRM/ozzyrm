@@ -1,0 +1,10 @@
+# Update with real GitHub usernames or @org/team before enabling required reviews.
+# See security/OPEN_SOURCE_SECURITY.md §5.2
+#
+# *                    @inRiza
+# /security/           @inRiza
+# /src/cli/            @inRiza
+# /src/security/       @inRiza
+# /src/catalog/        @inRiza
+# /src/parsers/        @inRiza
+# /src/react/server.ts @inRiza
