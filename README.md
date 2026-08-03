@@ -124,6 +124,20 @@ next dev           # terminal 2
 
 ```bash
 bun install
-bun test
+bun run typecheck
 bun run build
+# or full public CI gate:
+bun run ci
 ```
+
+## Contributing
+
+OzzyRM is open source. See:
+
+- [CONTRIBUTING.md](./CONTRIBUTING.md) — setup, hooks, PR expectations
+- [OPEN_SOURCE.md](./OPEN_SOURCE.md) — readiness / quality-gate checklist
+- [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
+- [SECURITY.md](./SECURITY.md) — vulnerability reporting
+- [CHANGELOG.md](./CHANGELOG.md)
+
+Security engineering docs live in [`security/`](./security/).
