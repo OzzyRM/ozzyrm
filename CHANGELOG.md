@@ -7,23 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-
-- Open-source contribution tooling: Husky hooks, GitHub Actions CI, CONTRIBUTING / CoC / SECURITY / LICENSE
-- Security sink scan (`bun run check:security`) in pre-commit and CI
-
-### Changed
-
-- Keep `/test` and `/fixtures` gitignored as internal maintainer playground (not part of the public tree)
-- Public CI gate: security sinks + typecheck + build (tests run locally when `/test` exists)
-
-## [0.3.0] - 2026-08-02
+## [0.3.1] - 2026-08-03
 
 ### Added
 
 - Security module: path confinement, datasource sanitization, stamp allowlist, logo `src` scheme filter
 - Security documentation under `security/`
+- Glossary badges and docs search open [ozzyrm.vercel.app](https://ozzyrm.vercel.app) glossary pages in a new tab
+- Optional `docsBaseUrl` on `OzzyRMDocs` / `OzzyRMDocsFromConfig` / `mount()` (default `https://ozzyrm.vercel.app`)
+- Open-source contribution tooling: Husky hooks, GitHub Actions CI, CONTRIBUTING / CoC / SECURITY / LICENSE
+- Security sink scan (`bun run check:security`) in pre-commit and CI
+
+### Changed
+
+- Glossary links map to `/docs/glossary/{type|attribute}/{key}` on the public docs site (new tab)
+- Keep `/test` and `/fixtures` gitignored as internal maintainer playground
+- Public CI gate: security sinks + typecheck + build
 
 ### Notes
 
-- Prior history lived in git commits; formal changelog starts here for OSS releases.
+- Combines the previously planned 0.3.0 and 0.4.0 work into a single patch release
+- Prior history lived in git commits; formal changelog starts here for OSS releases
