@@ -3,6 +3,17 @@
   "version": "0.3.0",
   "description": "Schema documentation toolkit for Prisma, Drizzle, and raw SQL",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Reldoc/reldoc.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Reldoc/reldoc/issues"
+  },
+  "homepage": "https://github.com/Reldoc/reldoc#readme",
+  "engines": {
+    "bun": ">=1.1.0"
+  },
   "bin": {
     "ozzyrm": "./dist/cli/bin.js"
   },
@@ -29,16 +40,24 @@
   },
   "files": [
     "dist",
-    "src/ui/styles.css"
+    "src/ui/styles.css",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
   ],
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
+    "prepare": "husky || true",
     "build:css": "tailwindcss -i ./src/ui/styles.entry.css -o ./dist/ui/styles.bundled.css --minify && bun run scripts/inline-css.ts",
     "build": "bun run build:css && tsc -p tsconfig.build.json",
-    "test": "bun test",
-    "prepublishOnly": "bun run build"
+    "typecheck": "tsc -p tsconfig.build.json --noEmit",
+    "test": "bun test ./test/*.test.ts",
+    "test:security": "bun test ./test/security.test.ts",
+    "check:security": "bun run scripts/check-security-sinks.ts",
+    "ci": "bun run check:security && bun run typecheck && bun run build",
+    "prepublishOnly": "bun run ci"
   },
   "dependencies": {
     "@boxicons/react": "^1.0.3",
@@ -61,6 +80,7 @@
     "@types/node": "^26.1.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "husky": "^9.1.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwindcss": "^4.3.3"
