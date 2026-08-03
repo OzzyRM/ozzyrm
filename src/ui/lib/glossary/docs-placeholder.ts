@@ -5,8 +5,8 @@ export interface DocsPlaceholderItem {
     title: string;
     description: string;
     category: GlossaryCategory;
-    /** placeholder path — replace with real landing docs URL later */
-    href: string;
+      /** path on the OzzyRM docs site — landing hosts these glossary pages */
+      href: string;
 }
 
 export const DOCS_PLACEHOLDER_ITEMS: DocsPlaceholderItem[] = GLOSSARY_ENTRIES.map(
@@ -15,7 +15,7 @@ export const DOCS_PLACEHOLDER_ITEMS: DocsPlaceholderItem[] = GLOSSARY_ENTRIES.ma
         title: entry.label,
         description: entry.summary,
         category: entry.category,
-        href: `#docs/${entry.category}/${entry.key}`,
+        href: `/docs/glossary/${entry.category}/${entry.key}`,
     })
 );
 

@@ -10,7 +10,7 @@ export interface OzzyRMMountHandle {
 }
 
 /**
- * Framework-agnostic mount (Swagger UI style).
+ * Framework-agnostic mount.
  * Styles are injected automatically on first mount.
  */
 export function mount(
