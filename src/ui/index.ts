@@ -10,3 +10,8 @@ export {
     findGroupBySchemaId,
     getSchemaFromCatalog,
 } from "./lib/catalog/catalog-utils";
+export {
+    DEFAULT_DOCS_SITE_ORIGIN,
+    glossaryDocsPath,
+    glossaryDocsUrl,
+} from "./lib/glossary/docs-site";

@@ -1,7 +1,8 @@
 "use client";
 
+import { useMemo } from "react";
 import {
-    DOCS_PLACEHOLDER_ITEMS,
+    buildDocsPlaceholderItems,
     searchDocsPlaceholder,
     type DocsPlaceholderItem,
 } from "../../lib/glossary/docs-placeholder";
@@ -12,27 +13,36 @@ interface DocsSearchDialogProps {
     open: boolean;
     onClose: () => void;
     initialQuery?: string;
+    docsBaseUrl?: string;
 }
 
 export function DocsSearchDialog({
     open,
     onClose,
     initialQuery = "",
+    docsBaseUrl,
 }: DocsSearchDialogProps) {
+    const items = useMemo(
+        () => buildDocsPlaceholderItems(docsBaseUrl),
+        [docsBaseUrl]
+    );
+
     return (
         <SearchDialog
             open={open}
             onClose={onClose}
             title="Search documentation"
-            placeholder="Search docs…"
-            footerLeft="Docs landing coming soon"
+            placeholder="Search glossary…"
             initialQuery={initialQuery}
-            items={DOCS_PLACEHOLDER_ITEMS}
+            items={items}
             filterItems={searchDocsPlaceholder}
             getItemId={(item) => item.id}
             onSelect={(item: DocsPlaceholderItem) => {
                 onClose();
-                window.location.hash = item.href.replace(/^#/, "");
+                if (typeof window === "undefined") {
+                    return;
+                }
+                window.open(item.url, "_blank", "noopener,noreferrer");
             }}
             renderItem={(item) => (
                 <>

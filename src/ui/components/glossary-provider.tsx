@@ -1,18 +1,33 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import {
+    createContext,
+    useCallback,
+    useContext,
+    useMemo,
+    useState,
+    type ReactNode,
+} from "react";
 import type { GlossaryCategory } from "../lib/glossary/entries";
+import { openGlossaryDocs } from "../lib/glossary/docs-site";
 import { lookupGlossary } from "../lib/glossary/lookup";
 import { DocsSearchDialog } from "./ui/docs-search-dialog";
 
 interface GlossaryContextValue {
     openGlossary: (label: string, category: GlossaryCategory) => void;
     openDocsSearch: (initialQuery?: string) => void;
+    docsBaseUrl: string;
 }
 
 const GlossaryContext = createContext<GlossaryContextValue | null>(null);
 
-export function GlossaryProvider({ children }: { children: ReactNode }) {
+export function GlossaryProvider({
+    children,
+    docsBaseUrl,
+}: {
+    children: ReactNode;
+    docsBaseUrl?: string;
+}) {
     const [open, setOpen] = useState(false);
     const [initialQuery, setInitialQuery] = useState("");
 
@@ -21,20 +36,28 @@ export function GlossaryProvider({ children }: { children: ReactNode }) {
         setOpen(true);
     }, []);
 
-    const openGlossary = useCallback((label: string, category: GlossaryCategory) => {
-        const match = lookupGlossary(label, category);
-        if (match) {
-            openDocsSearch(match.label);
-        }
-    }, [openDocsSearch]);
+    const openGlossary = useCallback(
+        (label: string, category: GlossaryCategory) => {
+            const match = lookupGlossary(label, category);
+            if (!match) {
+                return;
+            }
+            openGlossaryDocs(match.category, match.key, docsBaseUrl);
+        },
+        [docsBaseUrl]
+    );
 
     const close = useCallback(() => {
         setOpen(false);
     }, []);
 
     const value = useMemo(
-        () => ({ openGlossary, openDocsSearch }),
-        [openGlossary, openDocsSearch]
+        () => ({
+            openGlossary,
+            openDocsSearch,
+            docsBaseUrl: docsBaseUrl ?? "https://ozzyrm.vercel.app",
+        }),
+        [openGlossary, openDocsSearch, docsBaseUrl]
     );
 
     return (
@@ -45,6 +68,7 @@ export function GlossaryProvider({ children }: { children: ReactNode }) {
                 open={open}
                 onClose={close}
                 initialQuery={initialQuery}
+                docsBaseUrl={docsBaseUrl}
             />
         </GlossaryContext.Provider>
     );
