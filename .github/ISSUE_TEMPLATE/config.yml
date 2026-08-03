@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/Reldoc/reldoc/security/advisories/new
+    about: Privately report a security issue (do not file a public bug).
+  - name: Discussions / questions
+    url: https://github.com/Reldoc/reldoc/issues
+    about: For usage questions, prefer a clear issue with context from CONTRIBUTING.md.

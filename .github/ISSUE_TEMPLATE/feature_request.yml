@@ -1,0 +1,36 @@
+name: Feature request
+description: Propose an improvement to ozzyrm
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Features that execute consumer schema files, fetch remote configs, or render untrusted HTML are usually rejected — see [OPEN_SOURCE_SECURITY.md](../../security/OPEN_SOURCE_SECURITY.md).
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What problem does this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: How should it work?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
+  - type: checkboxes
+    id: trust
+    attributes:
+      label: Trust boundary
+      options:
+        - label: This does not execute untrusted code or weaken path confinement
+          required: true
