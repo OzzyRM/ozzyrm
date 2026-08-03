@@ -86,7 +86,7 @@ Prefer conventional commits:
 feat(catalog): fail closed on duplicate enum identity
 fix(cli): confine serve paths to root
 docs(security): clarify stamp allowlist
-chore(ci): add provenance publish workflow
+chore(ci): tighten security sink checks
 ```
 
 ## Release / publish
@@ -94,8 +94,9 @@ chore(ci): add provenance publish workflow
 Maintainers only. Do not publish from forks.
 
 - Semver: security fixes → patch; trust-model changes → major when needed
-- `prepublishOnly` runs a full build
-- Prefer tagged releases + CI publish with npm provenance
+- Publish **manually** from a trusted maintainer machine (`npm publish --access public`)
+- `prepublishOnly` runs the local CI gate (`check:security` + typecheck + build) before publish
+- Tag the release commit after a successful publish
 
 ## Need help?
 

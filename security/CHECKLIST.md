@@ -52,7 +52,7 @@ Use this checklist for **pull requests**, **releases**, and **consumer integrati
 - [ ] `bun run build` clean
 - [ ] `bun test` includes security-relevant regressions
 - [ ] Audit of production dependencies
-- [ ] npm publish from trusted CI or maintainer account only
+- [ ] npm publish from trusted maintainer account only (manual; no CI publish)
 - [ ] Tag matches published commit
 - [ ] Provenance enabled when available
 

@@ -66,8 +66,7 @@ Full rules: [`security/OPEN_SOURCE_SECURITY.md`](./security/OPEN_SOURCE_SECURITY
 
 ## 5. Supply chain
 
-- Publish only from maintainer CI or a trusted maintainer machine
-- Prefer `npm publish --provenance` on GitHub-hosted runners
+- Publish only from a trusted maintainer machine (manual `npm publish`)
 - Keep `bun.lock` committed
 - Consumers should pin `ozzyrm` in their lockfile
 - Review `bun audit` before each release ([`security/CHECKLIST.md`](./security/CHECKLIST.md) §B)
@@ -81,13 +80,14 @@ Full rules: [`security/OPEN_SOURCE_SECURITY.md`](./security/OPEN_SOURCE_SECURITY
 - [ ] Security checklist §B completed
 - [ ] CHANGELOG entry for the release
 - [ ] Version bump in `package.json` (semver)
+- [ ] Manual `npm publish --access public` from maintainer account
 - [ ] Git tag matches published version
 - [ ] CODEOWNERS handles filled (if using required reviews)
 - [ ] GitHub Security Advisories enabled on the repo
 
-## 7. Nice-to-have (post-0.4)
+## 7. Nice-to-have (later)
 
-- Release workflow (`workflow_dispatch` / tag → npm)
+- Optional release workflow only if maintainers explicitly want CI publish later
 - `changesets` or similar for changelog automation
 - Coverage report upload (optional threshold)
 - Scorecard / Dependabot (or Bun-equivalent) for deps
