@@ -1,0 +1,5 @@
+bun run typecheck
+# internal tests live in gitignored /test — run only when present
+if ls test/*.test.ts >/dev/null 2>&1; then
+  bun test ./test/*.test.ts
+fi
