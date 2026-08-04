@@ -1,6 +1,6 @@
 # Open Source Readiness — OzzyRM
 
-Specification for keeping the **main package** secure, reliable, and contributor-friendly before shipping (e.g. `0.3.1`).
+Specification for keeping the **main package** secure, reliable, and contributor-friendly before shipping (e.g. `0.3.2`).
 
 This is the project checklist. Security threat details live under [`security/`](./security/).
 

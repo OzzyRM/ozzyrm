@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-08-04
+
+### Changed
+
+- Hardcode glossary docs origin to `https://ozzyrm.vercel.app` (removed optional `docsBaseUrl` prop from mount APIs)
+
 ## [0.3.1] - 2026-08-03
 
 ### Added
@@ -14,7 +20,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Security module: path confinement, datasource sanitization, stamp allowlist, logo `src` scheme filter
 - Security documentation under `security/`
 - Glossary badges and docs search open [ozzyrm.vercel.app](https://ozzyrm.vercel.app) glossary pages in a new tab
-- Optional `docsBaseUrl` on `OzzyRMDocs` / `OzzyRMDocsFromConfig` / `mount()` (default `https://ozzyrm.vercel.app`)
 - Open-source contribution tooling: Husky hooks, GitHub Actions CI, CONTRIBUTING / CoC / SECURITY / LICENSE
 - Security sink scan (`bun run check:security`) in pre-commit and CI
 
