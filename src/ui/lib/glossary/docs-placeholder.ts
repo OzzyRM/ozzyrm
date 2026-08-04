@@ -1,5 +1,5 @@
 import { GLOSSARY_ENTRIES, type GlossaryCategory } from "./entries";
-import { glossaryDocsPath, glossaryDocsUrl, normalizeDocsSiteOrigin } from "./docs-site";
+import { glossaryDocsPath, glossaryDocsUrl } from "./docs-site";
 
 export interface DocsPlaceholderItem {
     id: string;
@@ -8,28 +8,20 @@ export interface DocsPlaceholderItem {
     category: GlossaryCategory;
     /** path on the OzzyRM docs site */
     href: string;
-    /** absolute URL used when opening the docs page */
+    /** absolute URL opened in a new tab */
     url: string;
 }
 
-export function buildDocsPlaceholderItems(
-    docsBaseUrl?: string
-): DocsPlaceholderItem[] {
-    const origin = normalizeDocsSiteOrigin(docsBaseUrl);
-
-    return GLOSSARY_ENTRIES.map((entry) => ({
+export const DOCS_PLACEHOLDER_ITEMS: DocsPlaceholderItem[] = GLOSSARY_ENTRIES.map(
+    (entry) => ({
         id: entry.key,
         title: entry.label,
         description: entry.summary,
         category: entry.category,
         href: glossaryDocsPath(entry.category, entry.key),
-        url: glossaryDocsUrl(entry.category, entry.key, origin),
-    }));
-}
-
-/** Default list pointed at https://ozzyrm.vercel.app */
-export const DOCS_PLACEHOLDER_ITEMS: DocsPlaceholderItem[] =
-    buildDocsPlaceholderItems();
+        url: glossaryDocsUrl(entry.category, entry.key),
+    })
+);
 
 export function searchDocsPlaceholder(
     query: string,

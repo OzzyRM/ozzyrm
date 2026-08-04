@@ -1,8 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
 import {
-    buildDocsPlaceholderItems,
+    DOCS_PLACEHOLDER_ITEMS,
     searchDocsPlaceholder,
     type DocsPlaceholderItem,
 } from "../../lib/glossary/docs-placeholder";
@@ -13,28 +12,22 @@ interface DocsSearchDialogProps {
     open: boolean;
     onClose: () => void;
     initialQuery?: string;
-    docsBaseUrl?: string;
 }
 
 export function DocsSearchDialog({
     open,
     onClose,
     initialQuery = "",
-    docsBaseUrl,
 }: DocsSearchDialogProps) {
-    const items = useMemo(
-        () => buildDocsPlaceholderItems(docsBaseUrl),
-        [docsBaseUrl]
-    );
-
     return (
         <SearchDialog
             open={open}
             onClose={onClose}
             title="Search documentation"
             placeholder="Search glossary…"
+            footerLeft="Opens ozzyrm.vercel.app in a new tab"
             initialQuery={initialQuery}
-            items={items}
+            items={DOCS_PLACEHOLDER_ITEMS}
             filterItems={searchDocsPlaceholder}
             getItemId={(item) => item.id}
             onSelect={(item: DocsPlaceholderItem) => {

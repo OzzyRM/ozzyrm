@@ -23,7 +23,6 @@ export function SchemaDocs({
     defaultSchemaId,
     basePath = "/",
     logoSrc,
-    docsBaseUrl,
 }: SchemaDocsProps) {
     const resolvedDefaultId = defaultSchemaId ?? catalog[0]?.versions[0]?.id ?? "";
     const mainRef = useRef<HTMLElement>(null);
@@ -118,7 +117,7 @@ export function SchemaDocs({
     const enumNames = new Set(schema.enums.map((enumDef: { name: string }) => enumDef.name));
 
     return (
-        <GlossaryProvider docsBaseUrl={docsBaseUrl}>
+        <GlossaryProvider>
             <div
                 className="ozzyrm-root flex h-screen overflow-hidden bg-background text-foreground"
                 data-base-path={basePath}

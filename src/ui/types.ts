@@ -11,9 +11,4 @@ export interface OzzyRMDocsOptions {
     defaultSchemaId?: string;
     basePath?: string;
     logoSrc?: string;
-    /**
-     * Origin for glossary / docs links opened from the UI.
-     * Default: https://ozzyrm.vercel.app
-     */
-    docsBaseUrl?: string;
 }

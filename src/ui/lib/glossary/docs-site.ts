@@ -1,12 +1,7 @@
 /** Public docs site that hosts glossary pages for the mounted UI. */
-export const DEFAULT_DOCS_SITE_ORIGIN = "https://ozzyrm.vercel.app";
+export const DOCS_SITE_ORIGIN = "https://ozzyrm.vercel.app";
 
 export type GlossaryDocsCategory = "type" | "attribute";
-
-export function normalizeDocsSiteOrigin(origin?: string): string {
-    const raw = (origin ?? DEFAULT_DOCS_SITE_ORIGIN).trim().replace(/\/+$/, "");
-    return raw.length > 0 ? raw : DEFAULT_DOCS_SITE_ORIGIN;
-}
 
 /** Path only, e.g. `/docs/glossary/type/string` */
 export function glossaryDocsPath(
@@ -16,27 +11,21 @@ export function glossaryDocsPath(
     return `/docs/glossary/${category}/${key}`;
 }
 
-/** Absolute glossary URL on the docs site. */
+/** Absolute glossary URL on ozzyrm.vercel.app */
 export function glossaryDocsUrl(
     category: GlossaryDocsCategory,
-    key: string,
-    origin?: string
+    key: string
 ): string {
-    return `${normalizeDocsSiteOrigin(origin)}${glossaryDocsPath(category, key)}`;
+    return `${DOCS_SITE_ORIGIN}${glossaryDocsPath(category, key)}`;
 }
 
 export function openGlossaryDocs(
     category: GlossaryDocsCategory,
-    key: string,
-    origin?: string
+    key: string
 ): void {
     if (typeof window === "undefined") {
         return;
     }
 
-    window.open(
-        glossaryDocsUrl(category, key, origin),
-        "_blank",
-        "noopener,noreferrer"
-    );
+    window.open(glossaryDocsUrl(category, key), "_blank", "noopener,noreferrer");
 }

@@ -16,18 +16,11 @@ import { DocsSearchDialog } from "./ui/docs-search-dialog";
 interface GlossaryContextValue {
     openGlossary: (label: string, category: GlossaryCategory) => void;
     openDocsSearch: (initialQuery?: string) => void;
-    docsBaseUrl: string;
 }
 
 const GlossaryContext = createContext<GlossaryContextValue | null>(null);
 
-export function GlossaryProvider({
-    children,
-    docsBaseUrl,
-}: {
-    children: ReactNode;
-    docsBaseUrl?: string;
-}) {
+export function GlossaryProvider({ children }: { children: ReactNode }) {
     const [open, setOpen] = useState(false);
     const [initialQuery, setInitialQuery] = useState("");
 
@@ -42,9 +35,9 @@ export function GlossaryProvider({
             if (!match) {
                 return;
             }
-            openGlossaryDocs(match.category, match.key, docsBaseUrl);
+            openGlossaryDocs(match.category, match.key);
         },
-        [docsBaseUrl]
+        []
     );
 
     const close = useCallback(() => {
@@ -52,12 +45,8 @@ export function GlossaryProvider({
     }, []);
 
     const value = useMemo(
-        () => ({
-            openGlossary,
-            openDocsSearch,
-            docsBaseUrl: docsBaseUrl ?? "https://ozzyrm.vercel.app",
-        }),
-        [openGlossary, openDocsSearch, docsBaseUrl]
+        () => ({ openGlossary, openDocsSearch }),
+        [openGlossary, openDocsSearch]
     );
 
     return (
@@ -68,7 +57,6 @@ export function GlossaryProvider({
                 open={open}
                 onClose={close}
                 initialQuery={initialQuery}
-                docsBaseUrl={docsBaseUrl}
             />
         </GlossaryContext.Provider>
     );
